@@ -1,0 +1,29 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1c1917;
+
+  /* PerCol 브랜드 토큰 */
+  --color-cream: #f4eee2; /* 히어로 배너 배경 */
+  --color-cream-soft: #faf6ee;
+  --color-brand: #e0552b; /* 포인트 (활성 탭/할인/별점) */
+  --color-ink: #1f1b16;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-cream: var(--color-cream);
+  --color-cream-soft: var(--color-cream-soft);
+  --color-brand: var(--color-brand);
+  --color-ink: var(--color-ink);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
