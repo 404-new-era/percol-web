@@ -4,9 +4,9 @@ import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product/ProductCard";
 import { SearchIcon } from "@/components/ui/icons";
-import { useProducts } from "@/hooks/useProducts";
+import { useAllProducts, useProducts } from "@/hooks/useProducts";
 import { cn } from "@/lib/utils";
-import type { ProductSort } from "@/types";
+import type { Product, ProductSort } from "@/types";
 
 const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
 const SORTS: { key: ProductSort; label: string }[] = [
@@ -15,17 +15,43 @@ const SORTS: { key: ProductSort; label: string }[] = [
   { key: "price_desc", label: "높은 가격순" },
 ];
 
+/** 색 칩 — colorName(한/영) 부분일치로 매칭 */
+const COLORS: { label: string; hex: string; match: string[] }[] = [
+  { label: "블랙", hex: "#1a1a1a", match: ["블랙", "BLACK"] },
+  { label: "화이트", hex: "#ffffff", match: ["화이트", "WHITE"] },
+  { label: "그레이", hex: "#9ca3af", match: ["그레이", "GREY", "GRAY"] },
+  { label: "네이비", hex: "#1f3a5f", match: ["네이비", "NAVY"] },
+  { label: "블루", hex: "#3b82f6", match: ["블루", "BLUE"] },
+  { label: "브라운", hex: "#7a5230", match: ["브라운", "BROWN"] },
+  { label: "베이지", hex: "#d8c3a5", match: ["베이지", "BEIGE", "NATURAL"] },
+  { label: "올리브", hex: "#6b6b3a", match: ["올리브", "카키", "OLIVE", "KHAKI"] },
+  { label: "그린", hex: "#4a7a3a", match: ["그린", "GREEN"] },
+  { label: "레드", hex: "#c0392b", match: ["레드", "RED", "와인", "WINE"] },
+  { label: "오렌지", hex: "#e8772e", match: ["오렌지", "ORANGE"] },
+  { label: "옐로", hex: "#f1c40f", match: ["옐로", "YELLOW"] },
+  { label: "핑크", hex: "#e8a0c0", match: ["핑크", "PINK"] },
+  { label: "크림", hex: "#f5ecd8", match: ["크림", "CREAM", "아이보리", "IVORY"] },
+];
+
+function matchColor(colorName: string, label: string): boolean {
+  const c = COLORS.find((x) => x.label === label);
+  if (!c) return true;
+  const name = (colorName ?? "").toUpperCase();
+  return c.match.some((m) => name.includes(m.toUpperCase()));
+}
+
+const PAGE_SIZE = 40;
+
 function ProductsInner() {
   const sp = useSearchParams();
-
-  // URL 쿼리에서 초기값 (헤더 검색 등으로 진입 시)
   const [category, setCategory] = useState(sp.get("category") ?? "전체");
   const [input, setInput] = useState(sp.get("keyword") ?? "");
   const [keyword, setKeyword] = useState(sp.get("keyword") ?? "");
+  const [color, setColor] = useState<string | null>(null);
   const [sort, setSort] = useState<ProductSort>("recent");
   const [page, setPage] = useState(1);
 
-  // 엔터 없이 실시간 검색 — 입력 멈추면 300ms 뒤 자동 반영
+  // 엔터 없이 실시간 검색
   useEffect(() => {
     const id = setTimeout(() => {
       setKeyword(input.trim());
@@ -34,24 +60,42 @@ function ProductsInner() {
     return () => clearTimeout(id);
   }, [input]);
 
-  const { data, isLoading, isError, isFetching } = useProducts({
+  const baseFilter = {
     category: category === "전체" ? undefined : category,
     keyword: keyword || undefined,
     sort,
-    page,
-    limit: 40,
-  });
+  };
 
-  const total = data?.meta.total ?? 0;
-  const limit = data?.meta.limit ?? 40;
-  const totalPages = Math.max(1, Math.ceil(total / limit));
+  // 색 선택 시: 전체 받아와 클라이언트 필터 / 아니면 서버 페이지네이션
+  const colorActive = !!color;
+  const paged = useProducts(
+    { ...baseFilter, page, limit: PAGE_SIZE },
+    { enabled: !colorActive },
+  );
+  const all = useAllProducts(baseFilter, { enabled: colorActive });
 
-  const reset = () => setPage(1);
+  let items: Product[];
+  let total: number;
+  let loading: boolean;
+  if (colorActive) {
+    const matched = (all.data ?? []).filter((p) =>
+      matchColor(p.colorName, color),
+    );
+    total = matched.length;
+    items = matched.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+    loading = all.isLoading;
+  } else {
+    items = paged.data?.items ?? [];
+    total = paged.data?.meta.total ?? 0;
+    loading = paged.isLoading;
+  }
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const isError = colorActive ? all.isError : paged.isError;
 
   return (
     <div className="py-6 pb-16">
       {/* 검색 (입력 즉시 필터) */}
-      <div className="relative mb-4">
+      <div className="relative mb-3">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -72,14 +116,14 @@ function ProductsInner() {
         )}
       </div>
 
-      {/* 카테고리 탭 */}
-      <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
+      {/* 카테고리 */}
+      <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
         {CATEGORIES.map((c) => (
           <button
             key={c}
             onClick={() => {
               setCategory(c);
-              reset();
+              setPage(1);
             }}
             className={cn(
               "shrink-0 rounded-full px-3.5 py-1.5 text-sm transition",
@@ -93,10 +137,44 @@ function ProductsInner() {
         ))}
       </div>
 
+      {/* 색 필터 */}
+      <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
+        {COLORS.map((c) => {
+          const active = color === c.label;
+          return (
+            <button
+              key={c.label}
+              title={c.label}
+              onClick={() => {
+                setColor(active ? null : c.label);
+                setPage(1);
+              }}
+              className={cn(
+                "h-7 w-7 shrink-0 rounded-full ring-1 ring-black/10 transition",
+                active && "ring-2 ring-ink ring-offset-2",
+              )}
+              style={{ backgroundColor: c.hex }}
+            />
+          );
+        })}
+        {color && (
+          <button
+            onClick={() => {
+              setColor(null);
+              setPage(1);
+            }}
+            className="shrink-0 whitespace-nowrap text-xs text-zinc-400 underline"
+          >
+            색 해제
+          </button>
+        )}
+      </div>
+
       {/* 정렬 + 개수 */}
       <div className="mb-4 flex items-center justify-between">
         <span className="text-sm text-zinc-500">
           {keyword && <b className="text-ink">“{keyword}” </b>}
+          {color && <b className="text-ink">{color} </b>}
           {total.toLocaleString()}개
         </span>
         <div className="flex gap-1">
@@ -105,7 +183,7 @@ function ProductsInner() {
               key={s.key}
               onClick={() => {
                 setSort(s.key);
-                reset();
+                setPage(1);
               }}
               className={cn(
                 "rounded-full px-3 py-1 text-xs",
@@ -120,7 +198,7 @@ function ProductsInner() {
         </div>
       </div>
 
-      {isLoading ? (
+      {loading ? (
         <Grid>
           {Array.from({ length: 12 }).map((_, i) => (
             <div
@@ -129,18 +207,18 @@ function ProductsInner() {
             />
           ))}
         </Grid>
-      ) : isError || !data ? (
+      ) : isError ? (
         <p className="py-20 text-center text-sm text-zinc-400">
           상품을 불러오지 못했어요.
         </p>
-      ) : data.items.length === 0 ? (
+      ) : items.length === 0 ? (
         <p className="py-20 text-center text-sm text-zinc-400">
           조건에 맞는 상품이 없어요.
         </p>
       ) : (
         <>
           <Grid>
-            {data.items.map((p) => (
+            {items.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </Grid>
@@ -148,7 +226,7 @@ function ProductsInner() {
           {totalPages > 1 && (
             <div className="mt-10 flex items-center justify-center gap-3 text-sm">
               <button
-                disabled={page <= 1 || isFetching}
+                disabled={page <= 1}
                 onClick={() => setPage((p) => p - 1)}
                 className="rounded-lg border border-zinc-200 px-3 py-1.5 disabled:opacity-40"
               >
@@ -158,7 +236,7 @@ function ProductsInner() {
                 {page} / {totalPages}
               </span>
               <button
-                disabled={page >= totalPages || isFetching}
+                disabled={page >= totalPages}
                 onClick={() => setPage((p) => p + 1)}
                 className="rounded-lg border border-zinc-200 px-3 py-1.5 disabled:opacity-40"
               >
@@ -180,7 +258,7 @@ function Grid({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** 상품 목록 — 카테고리/검색/정렬/페이지 (실 API) */
+/** 상품 목록 — 카테고리/색/검색/정렬/페이지 (실 API) */
 export default function ProductsPage() {
   return (
     <Suspense fallback={<div className="py-24" />}>

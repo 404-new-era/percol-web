@@ -70,23 +70,29 @@ export default function RecommendPage() {
 
   return (
     <div className="py-6 pb-16">
-      {/* 헤더 (시즌 색) */}
-      <div
-        className="mb-5 rounded-2xl px-6 py-5"
-        style={{ backgroundColor: th.bg }}
-      >
-        <p className="text-xs" style={{ color: th.textMuted }}>
-          {t("result.recommendTitle")}
-        </p>
-        <h1
-          className="mt-0.5 text-2xl font-extrabold tracking-tight"
-          style={{ color: th.text }}
-        >
-          {content.labelKR}
-        </h1>
-        <p className="mt-0.5 text-sm" style={{ color: th.accent }}>
-          {content.tagline} · {total.toLocaleString()}개
-        </p>
+      {/* 헤더 (컴팩트) */}
+      <div className="mb-5 flex items-center justify-between gap-4">
+        <div className="min-w-0">
+          <p className="text-xs text-zinc-400">{t("result.recommendTitle")}</p>
+          <h1
+            className="text-2xl font-extrabold tracking-tight"
+            style={{ color: th.accent }}
+          >
+            {content.labelKR}
+          </h1>
+          <p className="mt-0.5 text-xs text-zinc-500">
+            {content.tagline} · {total.toLocaleString()}개
+          </p>
+        </div>
+        <div className="flex shrink-0 gap-1.5">
+          {content.burst.slice(0, 4).map((hex) => (
+            <span
+              key={hex}
+              className="h-7 w-7 rounded-full ring-1 ring-black/5"
+              style={{ backgroundColor: hex }}
+            />
+          ))}
+        </div>
       </div>
 
       {/* 카테고리 */}
