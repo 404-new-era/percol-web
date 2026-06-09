@@ -32,12 +32,18 @@ export function useAllProducts(
     staleTime: 60 * 1000,
     queryFn: async () => {
       const limit = 50;
-      const items: Awaited<ReturnType<typeof productsApi.list>>["items"] = [];
-      for (let page = 1; page <= maxPages; page++) {
-        const res = await productsApi.list({ ...query, page, limit });
-        items.push(...res.items);
-        if (items.length >= res.meta.total || res.items.length < limit) break;
-      }
+      // 1페이지로 총 개수 파악 → 나머지 페이지 병렬 요청 (빠르게 전체 수집)
+      const first = await productsApi.list({ ...query, page: 1, limit });
+      const pages = Math.min(maxPages, Math.ceil(first.meta.total / limit));
+      const rest =
+        pages > 1
+          ? await Promise.all(
+              Array.from({ length: pages - 1 }, (_, i) =>
+                productsApi.list({ ...query, page: i + 2, limit }),
+              ),
+            )
+          : [];
+      const items = [first.items, ...rest.map((r) => r.items)].flat();
       return dedupeById(items);
     },
   });

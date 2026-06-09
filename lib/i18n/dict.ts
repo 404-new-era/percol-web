@@ -38,7 +38,7 @@ export const DICT = {
       snapTitle: "코디 스냅",
       onboarding: {
         kicker: "처음이신가요?",
-        title: "아직 내 퍼스널 컬러를\n몰라요",
+        title: "아직 내 퍼스널 컬러를\n몰라요?",
         desc: "3초 만에 진단하고 나에게 어울리는 색을 찾아보세요. 로그인 없이도 가능해요.",
         cta: "퍼스널 컬러 진단하러 가기",
       },

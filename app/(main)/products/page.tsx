@@ -33,11 +33,52 @@ const COLORS: { label: string; hex: string; match: string[] }[] = [
   { label: "크림", hex: "#f5ecd8", match: ["크림", "CREAM", "아이보리", "IVORY"] },
 ];
 
-function matchColor(colorName: string, label: string): boolean {
+function hexToRgb(hex: string): [number, number, number] | null {
+  const m = /^#?([0-9a-f]{6})$/i.exec((hex ?? "").trim());
+  if (!m) return null;
+  const n = parseInt(m[1], 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+
+/** redmean 근사 색거리 (지각적으로 단순 유클리드보다 나음) */
+function colorDist(a: [number, number, number], b: [number, number, number]) {
+  const rmean = (a[0] + b[0]) / 2;
+  const dr = a[0] - b[0];
+  const dg = a[1] - b[1];
+  const db = a[2] - b[2];
+  return (
+    (2 + rmean / 256) * dr * dr + 4 * dg * dg + (2 + (255 - rmean) / 256) * db * db
+  );
+}
+
+const COLOR_RGB = COLORS.map((c) => ({
+  label: c.label,
+  rgb: hexToRgb(c.hex)!,
+}));
+
+/** colorHex로 가장 가까운 색 버킷 (브랜드 무관) */
+function nearestColor(hex: string): string | null {
+  const rgb = hexToRgb(hex);
+  if (!rgb) return null;
+  let best: string | null = null;
+  let bestD = Infinity;
+  for (const c of COLOR_RGB) {
+    const d = colorDist(rgb, c.rgb);
+    if (d < bestD) {
+      bestD = d;
+      best = c.label;
+    }
+  }
+  return best;
+}
+
+/** colorName 키워드 매칭(표준 브랜드) OR colorHex 최근접(모든 브랜드) */
+function matchColor(p: Product, label: string): boolean {
   const c = COLORS.find((x) => x.label === label);
   if (!c) return true;
-  const name = (colorName ?? "").toUpperCase();
-  return c.match.some((m) => name.includes(m.toUpperCase()));
+  const name = (p.colorName ?? "").toUpperCase();
+  if (c.match.some((m) => name.includes(m.toUpperCase()))) return true;
+  return nearestColor(p.colorHex) === label;
 }
 
 const PAGE_SIZE = 40;
@@ -73,15 +114,17 @@ function ProductsInner() {
     { ...baseFilter, page, limit: PAGE_SIZE },
     { enabled: !colorActive },
   );
-  const all = useAllProducts(baseFilter, { enabled: colorActive });
+  // 색 필터는 전체 카탈로그 대상 (작은 브랜드 누락 방지)
+  const all = useAllProducts(baseFilter, {
+    enabled: colorActive,
+    maxPages: 40,
+  });
 
   let items: Product[];
   let total: number;
   let loading: boolean;
   if (colorActive) {
-    const matched = (all.data ?? []).filter((p) =>
-      matchColor(p.colorName, color),
-    );
+    const matched = (all.data ?? []).filter((p) => matchColor(p, color));
     total = matched.length;
     items = matched.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
     loading = all.isLoading;
