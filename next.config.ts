@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
  * 로컬 백엔드로 붙이려면 BACKEND_ORIGIN=http://localhost:3000 설정.
  */
 const BACKEND_ORIGIN =
-  process.env.BACKEND_ORIGIN ?? "http://43.201.8.235:3000";
+  process.env.BACKEND_ORIGIN ?? "https://43.201.8.235.sslip.io";
 
 const nextConfig: NextConfig = {
   /**

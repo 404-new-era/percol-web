@@ -1,8 +1,8 @@
 /** 환경 설정 — 모든 외부 URL은 여기서만 읽는다. */
 
-/** 배포 백엔드 오리진 (OAuth 리다이렉트 시작용 절대 URL) */
+/** 배포 백엔드 오리진 (OAuth 리다이렉트 시작용 절대 URL, HTTPS) */
 const BACKEND_ORIGIN =
-  process.env.NEXT_PUBLIC_BACKEND_ORIGIN ?? "http://43.201.8.235:3000";
+  process.env.NEXT_PUBLIC_BACKEND_ORIGIN ?? "https://43.201.8.235.sslip.io";
 
 export const config = {
   /**
