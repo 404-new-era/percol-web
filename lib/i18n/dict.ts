@@ -23,6 +23,7 @@ export const DICT = {
     },
     nav: {
       category: "카테고리",
+      home: "홈",
       recommend: "추천",
       ranking: "랭킹",
       sale: "세일",
@@ -89,6 +90,7 @@ export const DICT = {
       avoid: "피할 시즌",
       seeRecommend: "맞춤 추천 보러가기",
       share: "결과 공유",
+      popular: "인기 상품",
       notFound: "결과를 찾을 수 없어요.",
     },
     profile: {
@@ -157,6 +159,7 @@ export const DICT = {
     },
     nav: {
       category: "Category",
+      home: "Home",
       recommend: "For You",
       ranking: "Ranking",
       sale: "Sale",
@@ -223,6 +226,7 @@ export const DICT = {
       avoid: "Avoid",
       seeRecommend: "See my recommendations",
       share: "Share",
+      popular: "Popular now",
       notFound: "Result not found.",
     },
     profile: {

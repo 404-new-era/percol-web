@@ -8,31 +8,40 @@ import { useT } from "@/hooks/useT";
 import { useMe } from "@/hooks/useUser";
 import { seasonTheme } from "@/lib/personalColor";
 
-/** 카테고리 | 추천 랭킹 세일 진단 스냅 브랜드 (목업 기준) — 각 탭 고유 경로 */
+/** 홈 | 추천(맞춤) 랭킹 진단 스냅 브랜드 — 각 탭 고유 경로 */
 const NAV = [
-  { key: "nav.recommend", href: "/" },
+  { key: "nav.home", href: "/" },
+  { key: "nav.recommend", href: "/products/recommend" },
   { key: "nav.ranking", href: "/products" },
-  { key: "nav.sale", href: "/sale" },
   { key: "nav.diagnosis", href: "/diagnosis" },
   { key: "nav.snap", href: "/posts" },
   { key: "nav.brand", href: "/brands" },
 ];
 
-/** 정확 매칭 (자기 경로 또는 그 하위 경로일 때만 활성) */
-function isActive(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
+/** 현재 경로에 매칭되는 nav href 중 가장 긴 것 (최장 프리픽스 → /products/recommend가 /products보다 우선) */
+function activeHref(pathname: string): string | null {
+  let best: string | null = null;
+  for (const { href } of NAV) {
+    const match =
+      href === "/"
+        ? pathname === "/"
+        : pathname === href || pathname.startsWith(`${href}/`);
+    if (match && (best === null || href.length > best.length)) best = href;
+  }
+  return best;
 }
 
 export function CategoryNav() {
   const pathname = usePathname();
   const { t } = useT();
-  // 활성 탭 underline 색 = 내 퍼스널 컬러 시즌 색 (진단 있으면), 없으면 브랜드색
+  const active = activeHref(pathname);
+  // 활성 탭 underline 색 = 내 퍼스널 컬러 시즌 색 (진단 있으면), 없으면 검정
   const { data: me } = useMe();
   const season = me?.latestDiagnosis?.season;
   const underlineColor = season
     ? seasonTheme(season).accent
     : "var(--color-ink)";
+
   return (
     <nav className="mx-auto flex w-full max-w-5xl items-center gap-4 px-4 pb-2 text-sm">
       <button className="flex items-center gap-1 font-medium text-ink">
@@ -41,18 +50,19 @@ export function CategoryNav() {
       </button>
       <span className="h-3 w-px bg-zinc-200" />
       {NAV.map((item) => {
-        const active = isActive(pathname, item.href);
+        const isActive = active === item.href;
         return (
           <Link
             key={item.key}
             href={item.href}
+            onClick={() => window.scrollTo({ top: 0 })}
             className={cn(
-              "relative pb-1 text-zinc-500 hover:text-ink",
-              active && "font-semibold text-ink",
+              "relative shrink-0 pb-1 text-zinc-500 hover:text-ink",
+              isActive && "font-semibold text-ink",
             )}
           >
             {t(item.key)}
-            {active && (
+            {isActive && (
               <span
                 className="absolute -bottom-[3px] left-0 h-0.5 w-full rounded-full"
                 style={{ backgroundColor: underlineColor }}

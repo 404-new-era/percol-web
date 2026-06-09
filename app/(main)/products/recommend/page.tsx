@@ -26,44 +26,23 @@ export default function RecommendPage() {
   const [category, setCategory] = useState("전체");
   const [page, setPage] = useState(1);
 
+  const hasDiagnosis = !!season;
   const { data, isLoading, isFetching } = useProducts(
     {
       season,
       tone,
       category: category === "전체" ? undefined : category,
+      sort: hasDiagnosis ? undefined : "recent",
       page,
       limit: 30,
     },
-    { enabled: mounted && !!season },
+    { enabled: mounted },
   );
 
-  if (!mounted)
-    return (
-      <Centered>{t("common.loading")}</Centered>
-    );
+  if (!mounted) return <Centered>{t("common.loading")}</Centered>;
 
-  // 진단 이력 없음 → 진단 유도 (로그인 아님)
-  if (!season) {
-    return (
-      <div className="mx-auto flex w-full max-w-sm flex-1 flex-col items-center justify-center py-20 text-center">
-        <h1 className="text-xl font-bold text-ink">
-          {t("profile.noDiagnosisTitle")}
-        </h1>
-        <p className="mt-2 text-sm text-zinc-500">
-          {t("profile.noDiagnosisSub")}
-        </p>
-        <Link
-          href="/diagnosis"
-          className="mt-6 inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-semibold text-white"
-        >
-          {t("home.onboarding.cta")}
-        </Link>
-      </div>
-    );
-  }
-
-  const content = seasonContent(season, locale);
-  const th = seasonTheme(season);
+  const content = hasDiagnosis ? seasonContent(season, locale) : null;
+  const th = hasDiagnosis ? seasonTheme(season) : null;
   const items = dedupeById(data?.items ?? []);
   const total = data?.meta.total ?? 0;
   const limit = data?.meta.limit ?? 30;
@@ -71,30 +50,56 @@ export default function RecommendPage() {
 
   return (
     <div className="py-6 pb-16">
-      {/* 헤더 (컴팩트) */}
-      <div className="mb-5 flex items-center justify-between gap-4">
-        <div className="min-w-0">
-          <p className="text-xs text-zinc-400">{t("result.recommendTitle")}</p>
-          <h1
-            className="text-2xl font-extrabold tracking-tight"
-            style={{ color: th.accent }}
+      {/* 진단 있음: 시즌 헤더 / 없음: 진단 유도 배너 */}
+      {hasDiagnosis && content && th ? (
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-xs text-zinc-400">
+              {t("result.recommendTitle")}
+            </p>
+            <h1
+              className="text-2xl font-extrabold tracking-tight"
+              style={{ color: th.accent }}
+            >
+              {content.labelKR}
+            </h1>
+            <p className="mt-0.5 text-xs text-zinc-500">
+              {content.tagline} · {total.toLocaleString()}개
+            </p>
+          </div>
+          <div className="flex shrink-0 gap-1.5">
+            {content.burst.slice(0, 4).map((hex) => (
+              <span
+                key={hex}
+                className="h-7 w-7 rounded-full ring-1 ring-black/5"
+                style={{ backgroundColor: hex }}
+              />
+            ))}
+          </div>
+        </div>
+      ) : (
+        <div className="mb-5">
+          <Link
+            href="/diagnosis"
+            className="flex items-center justify-between rounded-2xl bg-cream px-5 py-4 hover:opacity-95"
           >
-            {content.labelKR}
+            <div>
+              <p className="text-sm font-bold text-[#4a3526]">
+                {t("profile.noDiagnosisTitle")}
+              </p>
+              <p className="mt-0.5 text-xs text-[#8a6c47]">
+                {t("profile.noDiagnosisSub")}
+              </p>
+            </div>
+            <span className="shrink-0 rounded-full bg-ink px-4 py-2 text-xs font-semibold text-white">
+              {t("nav.diagnosis")}
+            </span>
+          </Link>
+          <h1 className="mt-5 text-lg font-bold text-ink">
+            {t("result.popular")}
           </h1>
-          <p className="mt-0.5 text-xs text-zinc-500">
-            {content.tagline} · {total.toLocaleString()}개
-          </p>
         </div>
-        <div className="flex shrink-0 gap-1.5">
-          {content.burst.slice(0, 4).map((hex) => (
-            <span
-              key={hex}
-              className="h-7 w-7 rounded-full ring-1 ring-black/5"
-              style={{ backgroundColor: hex }}
-            />
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* 카테고리 */}
       <div className="mb-4 flex gap-2 overflow-x-auto pb-1">
