@@ -116,8 +116,8 @@ function ProductsInner() {
         )}
       </div>
 
-      {/* 카테고리 */}
-      <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
+      {/* 카테고리 + 색 필터 (한 줄, 사이 구분선) */}
+      <div className="mb-4 flex items-center gap-2 overflow-x-auto py-2">
         {CATEGORIES.map((c) => (
           <button
             key={c}
@@ -135,16 +135,16 @@ function ProductsInner() {
             {c}
           </button>
         ))}
-      </div>
 
-      {/* 색 필터 */}
-      <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-1">
+        <span className="mx-1 h-6 w-px shrink-0 bg-zinc-200" />
+
         {COLORS.map((c) => {
           const active = color === c.label;
           return (
             <button
               key={c.label}
               title={c.label}
+              aria-label={c.label}
               onClick={() => {
                 setColor(active ? null : c.label);
                 setPage(1);
@@ -163,9 +163,9 @@ function ProductsInner() {
               setColor(null);
               setPage(1);
             }}
-            className="shrink-0 whitespace-nowrap text-xs text-zinc-400 underline"
+            className="shrink-0 whitespace-nowrap px-1 text-xs text-zinc-400 underline"
           >
-            색 해제
+            해제
           </button>
         )}
       </div>
