@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { HeartIcon, StarIcon } from "@/components/ui/icons";
+import { imageUrl } from "@/lib/utils";
 import type { Product } from "@/types";
 
 interface ProductCardProps {
@@ -9,7 +11,7 @@ interface ProductCardProps {
   discountRate?: number;
 }
 
-/** 추천 아이템 카드 (목업: 색 배경 + 찜수 + 브랜드/상품명/할인가/별점) */
+/** 추천/목록 상품 카드 — 실제 이미지 + 브랜드/상품명/가격, 상세로 링크 */
 export function ProductCard({
   product,
   rating,
@@ -18,11 +20,20 @@ export function ProductCard({
   discountRate,
 }: ProductCardProps) {
   return (
-    <article className="flex flex-col">
+    <Link href={`/products/${product.id}`} className="group flex flex-col">
       <div
-        className="relative aspect-[3/4] w-full overflow-hidden rounded-lg"
+        className="relative aspect-[3/4] w-full overflow-hidden rounded-lg bg-zinc-100"
         style={{ backgroundColor: product.colorHex }}
       >
+        {product.imageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl(product.imageUrl)}
+            alt={product.name}
+            loading="lazy"
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+          />
+        )}
         {likeCount != null && (
           <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur">
             <HeartIcon width={12} height={12} filled />
@@ -50,6 +61,6 @@ export function ProductCard({
           {reviewCount != null && <span>· {reviewCount.toLocaleString()}</span>}
         </p>
       )}
-    </article>
+    </Link>
   );
 }

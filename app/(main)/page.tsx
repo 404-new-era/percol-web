@@ -2,14 +2,15 @@
 
 import { DiagnosisBanner } from "@/components/home/DiagnosisBanner";
 import { SectionHeader } from "@/components/home/SectionHeader";
-import { ProductCard } from "@/components/product/ProductCard";
+import { RecommendGrid } from "@/components/home/RecommendGrid";
 import { SnapCard } from "@/components/post/SnapCard";
-import { MOCK_RECOMMEND, MOCK_SNAPS } from "@/lib/mock";
+import { MOCK_SNAPS } from "@/lib/mock";
 import { useT } from "@/hooks/useT";
 
 /**
- * 홈 — 진단결과 배너 + 추천 아이템 + 코디 스냅 (preview.png 기준).
- * 현재 MOCK_* 데이터로 렌더. 추후 useRecommend()/usePosts()로 교체.
+ * 홈 — 진단결과 배너 + 추천 아이템(실 API) + 코디 스냅.
+ * 추천 아이템은 RecommendGrid가 /products에서 실데이터 로드.
+ * 코디 스냅은 게시물 데이터 들어오기 전까지 MOCK_SNAPS.
  */
 export default function HomePage() {
   const { t } = useT();
@@ -21,20 +22,9 @@ export default function HomePage() {
         <SectionHeader
           title={t("home.recommendTitle")}
           subtitle={t("home.recommendSub")}
-          moreHref="/products/recommend"
+          moreHref="/products"
         />
-        <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-5">
-          {MOCK_RECOMMEND.map((p) => (
-            <ProductCard
-              key={p.id}
-              product={p}
-              rating={p.rating}
-              reviewCount={p.reviewCount}
-              likeCount={p.likeCount}
-              discountRate={p.discountRate}
-            />
-          ))}
-        </div>
+        <RecommendGrid />
       </section>
 
       <section className="mt-12">
