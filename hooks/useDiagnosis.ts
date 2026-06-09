@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { diagnosisApi } from "@/lib/api";
 import { qk } from "@/lib/query/keys";
 import type {
@@ -17,17 +17,31 @@ export function useSelfTestStages(mode: "question" | "color") {
   });
 }
 
+/**
+ * 진단 저장 성공 시 관련 캐시 무효화.
+ * → 홈/마이페이지의 latestDiagnosis(=/users/me)가 즉시 갱신되어 퍼스널 컬러가 바로 반영됨.
+ */
+function invalidateAfterDiagnosis(qc: ReturnType<typeof useQueryClient>) {
+  void qc.invalidateQueries({ queryKey: qk.users.me });
+  void qc.invalidateQueries({ queryKey: qk.users.myPage });
+  void qc.invalidateQueries({ queryKey: qk.diagnosis.all });
+}
+
 /** 셀프테스트 채점 */
 export function useSubmitSelfTest() {
+  const qc = useQueryClient();
   return useMutation<DiagnosisResult, Error, SelfTestSubmitInput>({
     mutationFn: (input) => diagnosisApi.submitSelfTest(input),
+    onSuccess: () => invalidateAfterDiagnosis(qc),
   });
 }
 
 /** 사진 자동분석 */
 export function useSubmitPhoto() {
+  const qc = useQueryClient();
   return useMutation<DiagnosisResult, Error, File>({
     mutationFn: (image) => diagnosisApi.submitPhoto(image),
+    onSuccess: () => invalidateAfterDiagnosis(qc),
   });
 }
 

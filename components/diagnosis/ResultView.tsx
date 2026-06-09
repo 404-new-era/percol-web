@@ -98,11 +98,19 @@ export function ResultView({
 
       {/* 내 퍼스널 컬러에 어울리는 옷 추천 */}
       <div className="mt-10 text-left">
-        <h2 className="mb-1 text-base font-bold text-ink">
-          {t("result.recommendTitle")}
-        </h2>
+        <div className="mb-1 flex items-end justify-between">
+          <h2 className="text-base font-bold text-ink">
+            {t("result.recommendTitle")}
+          </h2>
+          <Link
+            href="/products/recommend"
+            className="text-xs text-zinc-400 hover:text-zinc-600"
+          >
+            {t("common.seeMore")} ›
+          </Link>
+        </div>
         <p className="mb-4 text-xs text-zinc-500">{t("result.recommendSub")}</p>
-        <RecommendGrid season={result.season} tone={result.tone} limit={6} />
+        <RecommendGrid season={result.season} tone={result.tone} limit={10} />
       </div>
 
       {/* CTA */}

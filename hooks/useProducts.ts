@@ -5,10 +5,14 @@ import { productsApi } from "@/lib/api";
 import { qk } from "@/lib/query/keys";
 import type { ProductListQuery } from "@/types";
 
-export function useProducts(query?: ProductListQuery) {
+export function useProducts(
+  query?: ProductListQuery,
+  options?: { enabled?: boolean },
+) {
   return useQuery({
     queryKey: qk.products.list(query),
     queryFn: () => productsApi.list(query),
+    enabled: options?.enabled ?? true,
   });
 }
 
