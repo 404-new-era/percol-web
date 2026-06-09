@@ -1,8 +1,9 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { UserIcon } from "@/components/ui/icons";
 import { useT } from "@/hooks/useT";
+import { CameraModal } from "./CameraModal";
 
 /**
  * 얼굴 사진 선택기 (preview.webp 기준).
@@ -18,7 +19,7 @@ export function FacePicker({
   onPick: (file: File, url: string) => void;
 }) {
   const galleryRef = useRef<HTMLInputElement>(null);
-  const cameraRef = useRef<HTMLInputElement>(null);
+  const [cameraOpen, setCameraOpen] = useState(false);
   const { t } = useT();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +27,11 @@ export function FacePicker({
     if (!file) return;
     onPick(file, URL.createObjectURL(file));
     e.target.value = ""; // 같은 파일 다시 선택 가능하게
+  };
+
+  const handleCapture = (file: File) => {
+    onPick(file, URL.createObjectURL(file));
+    setCameraOpen(false);
   };
 
   return (
@@ -50,7 +56,7 @@ export function FacePicker({
       <div className="flex gap-2">
         <button
           type="button"
-          onClick={() => cameraRef.current?.click()}
+          onClick={() => setCameraOpen(true)}
           className="inline-flex h-11 items-center rounded-xl bg-ink px-5 text-sm font-semibold text-white hover:opacity-90"
         >
           📷 {t("diagnosis.face.camera")}
@@ -72,15 +78,13 @@ export function FacePicker({
         className="hidden"
         onChange={handleChange}
       />
-      {/* 직접 촬영 — 모바일에서 카메라 실행 (전면) */}
-      <input
-        ref={cameraRef}
-        type="file"
-        accept="image/*"
-        capture="user"
-        className="hidden"
-        onChange={handleChange}
-      />
+
+      {cameraOpen && (
+        <CameraModal
+          onCapture={handleCapture}
+          onClose={() => setCameraOpen(false)}
+        />
+      )}
     </div>
   );
 }
