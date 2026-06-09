@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { FacePicker } from "@/components/diagnosis/FacePicker";
 import { Button } from "@/components/ui/Button";
+import { LockIcon } from "@/components/ui/icons";
 import { useSubmitPhoto } from "@/hooks/useDiagnosis";
 import { useT } from "@/hooks/useT";
 import { useDiagnosisStore } from "@/store/diagnosis";
@@ -48,7 +49,8 @@ export default function PhotoDiagnosisPage() {
       </p>
 
       <div className="mt-5 w-full rounded-xl bg-zinc-50 p-4 text-left">
-        <p className="text-sm font-medium text-zinc-700">
+        <p className="flex items-center gap-1.5 text-sm font-medium text-zinc-700">
+          <LockIcon />
           {t("diagnosis.photo.noteTitle")}
         </p>
         <p className="mt-1 text-xs leading-5 text-zinc-500">

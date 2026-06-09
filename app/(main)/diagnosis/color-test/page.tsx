@@ -6,6 +6,7 @@ import { TestProgress } from "@/components/diagnosis/TestProgress";
 import { ColorStageView } from "@/components/diagnosis/ColorStageView";
 import { FacePicker } from "@/components/diagnosis/FacePicker";
 import { Button } from "@/components/ui/Button";
+import { LockIcon } from "@/components/ui/icons";
 import { useSelfTestStages, useSubmitSelfTest } from "@/hooks/useDiagnosis";
 import { useT } from "@/hooks/useT";
 import { useDiagnosisStore } from "@/store/diagnosis";
@@ -88,7 +89,8 @@ export default function ColorTestPage() {
         <div className="mt-10">
           <FacePicker onPick={(file) => handlePick(file)} />
         </div>
-        <p className="mt-8 rounded-xl bg-zinc-50 p-3 text-xs text-zinc-400">
+        <p className="mt-8 flex items-center justify-center gap-1.5 rounded-xl bg-zinc-50 p-3 text-xs text-zinc-400">
+          <LockIcon className="shrink-0" />
           {t("diagnosis.color.privacy")}
         </p>
       </div>

@@ -86,3 +86,10 @@ export const FilterIcon = (p: IconProps) => (
     <path d="M3 5h18M6 12h12M10 19h4" />
   </svg>
 );
+
+export const LockIcon = (p: IconProps) => (
+  <svg {...base(p)} width={14} height={14}>
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
+    <path d="M8 10.5V7a4 4 0 0 1 8 0v3.5" />
+  </svg>
+);

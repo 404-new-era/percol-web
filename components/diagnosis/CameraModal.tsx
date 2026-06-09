@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { CameraIcon } from "@/components/ui/icons";
 
 /**
  * 카메라 촬영 모달 — getUserMedia로 웹캠/전면카메라 미리보기 후 캡처.
@@ -100,9 +101,10 @@ export function CameraModal({
               type="button"
               onClick={capture}
               disabled={!ready}
-              className="h-11 flex-1 rounded-xl bg-ink text-sm font-semibold text-white disabled:opacity-50"
+              className="inline-flex h-11 flex-1 items-center justify-center gap-1.5 rounded-xl bg-ink text-sm font-semibold text-white disabled:opacity-50"
             >
-              📷 촬영
+              <CameraIcon width={17} height={17} />
+              촬영
             </button>
           )}
           <button

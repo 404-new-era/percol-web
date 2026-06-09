@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { UserIcon } from "@/components/ui/icons";
+import { CameraIcon, UserIcon } from "@/components/ui/icons";
 import { useT } from "@/hooks/useT";
 import { CameraModal } from "./CameraModal";
 
@@ -57,9 +57,10 @@ export function FacePicker({
         <button
           type="button"
           onClick={() => setCameraOpen(true)}
-          className="inline-flex h-11 items-center rounded-xl bg-ink px-5 text-sm font-semibold text-white hover:opacity-90"
+          className="inline-flex h-11 items-center gap-1.5 rounded-xl bg-ink px-5 text-sm font-semibold text-white hover:opacity-90"
         >
-          📷 {t("diagnosis.face.camera")}
+          <CameraIcon width={17} height={17} />
+          {t("diagnosis.face.camera")}
         </button>
         <button
           type="button"
