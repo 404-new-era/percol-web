@@ -17,20 +17,22 @@ export function FacePicker({
   previewUrl?: string;
   onPick: (file: File, url: string) => void;
 }) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const galleryRef = useRef<HTMLInputElement>(null);
+  const cameraRef = useRef<HTMLInputElement>(null);
   const { t } = useT();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     onPick(file, URL.createObjectURL(file));
+    e.target.value = ""; // 같은 파일 다시 선택 가능하게
   };
 
   return (
     <div className="flex flex-col items-center gap-5">
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
+        onClick={() => galleryRef.current?.click()}
         className="flex h-40 w-40 items-center justify-center overflow-hidden rounded-full bg-zinc-100 ring-1 ring-zinc-200 transition hover:bg-zinc-50"
       >
         {previewUrl ? (
@@ -45,18 +47,37 @@ export function FacePicker({
         )}
       </button>
 
-      <button
-        type="button"
-        onClick={() => inputRef.current?.click()}
-        className="inline-flex h-11 items-center rounded-xl bg-ink px-6 text-sm font-semibold text-white hover:opacity-90"
-      >
-        {t("diagnosis.face.choose")}
-      </button>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => cameraRef.current?.click()}
+          className="inline-flex h-11 items-center rounded-xl bg-ink px-5 text-sm font-semibold text-white hover:opacity-90"
+        >
+          📷 {t("diagnosis.face.camera")}
+        </button>
+        <button
+          type="button"
+          onClick={() => galleryRef.current?.click()}
+          className="inline-flex h-11 items-center rounded-xl border border-zinc-300 px-5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
+        >
+          {t("diagnosis.face.choose")}
+        </button>
+      </div>
 
+      {/* 앨범 선택 */}
       <input
-        ref={inputRef}
+        ref={galleryRef}
         type="file"
         accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={handleChange}
+      />
+      {/* 직접 촬영 — 모바일에서 카메라 실행 (전면) */}
+      <input
+        ref={cameraRef}
+        type="file"
+        accept="image/*"
+        capture="user"
         className="hidden"
         onChange={handleChange}
       />

@@ -3,9 +3,9 @@
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product/ProductCard";
-import { SearchIcon } from "@/components/ui/icons";
+import { FilterIcon, SearchIcon } from "@/components/ui/icons";
 import { useAllProducts, useProducts } from "@/hooks/useProducts";
-import { cn } from "@/lib/utils";
+import { cn, dedupeById } from "@/lib/utils";
 import type { Product, ProductSort } from "@/types";
 
 const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
@@ -50,6 +50,7 @@ function ProductsInner() {
   const [color, setColor] = useState<string | null>(null);
   const [sort, setSort] = useState<ProductSort>("recent");
   const [page, setPage] = useState(1);
+  const [filterOpen, setFilterOpen] = useState(false);
 
   // 엔터 없이 실시간 검색
   useEffect(() => {
@@ -89,6 +90,7 @@ function ProductsInner() {
     total = paged.data?.meta.total ?? 0;
     loading = paged.isLoading;
   }
+  items = dedupeById(items); // 백엔드 페이지 경계 중복 제거
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const isError = colorActive ? all.isError : paged.isError;
 
@@ -116,8 +118,8 @@ function ProductsInner() {
         )}
       </div>
 
-      {/* 카테고리 + 색 필터 (한 줄, 사이 구분선) */}
-      <div className="mb-4 flex items-center gap-2 overflow-x-auto py-2">
+      {/* 카테고리 */}
+      <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
         {CATEGORIES.map((c) => (
           <button
             key={c}
@@ -135,49 +137,39 @@ function ProductsInner() {
             {c}
           </button>
         ))}
-
-        <span className="mx-1 h-6 w-px shrink-0 bg-zinc-200" />
-
-        {COLORS.map((c) => {
-          const active = color === c.label;
-          return (
-            <button
-              key={c.label}
-              title={c.label}
-              aria-label={c.label}
-              onClick={() => {
-                setColor(active ? null : c.label);
-                setPage(1);
-              }}
-              className={cn(
-                "h-7 w-7 shrink-0 rounded-full ring-1 ring-black/10 transition",
-                active && "ring-2 ring-ink ring-offset-2",
-              )}
-              style={{ backgroundColor: c.hex }}
-            />
-          );
-        })}
-        {color && (
-          <button
-            onClick={() => {
-              setColor(null);
-              setPage(1);
-            }}
-            className="shrink-0 whitespace-nowrap px-1 text-xs text-zinc-400 underline"
-          >
-            해제
-          </button>
-        )}
       </div>
 
-      {/* 정렬 + 개수 */}
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm text-zinc-500">
-          {keyword && <b className="text-ink">“{keyword}” </b>}
-          {color && <b className="text-ink">{color} </b>}
-          {total.toLocaleString()}개
-        </span>
-        <div className="flex gap-1">
+      {/* 필터 버튼 + 개수 + 정렬 */}
+      <div className="mb-4 flex items-center justify-between gap-2">
+        <button
+          onClick={() => setFilterOpen(true)}
+          className={cn(
+            "flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium",
+            color
+              ? "border-ink text-ink"
+              : "border-zinc-200 text-zinc-600 hover:bg-zinc-50",
+          )}
+        >
+          <FilterIcon width={15} height={15} />
+          {color ? (
+            <span className="flex items-center gap-1">
+              <span
+                className="h-3 w-3 rounded-full ring-1 ring-black/10"
+                style={{
+                  backgroundColor: COLORS.find((c) => c.label === color)?.hex,
+                }}
+              />
+              {color}
+            </span>
+          ) : (
+            "색상 필터"
+          )}
+        </button>
+
+        <div className="flex items-center gap-2 overflow-x-auto">
+          <span className="shrink-0 text-xs text-zinc-400">
+            {total.toLocaleString()}개
+          </span>
           {SORTS.map((s) => (
             <button
               key={s.key}
@@ -186,7 +178,7 @@ function ProductsInner() {
                 setPage(1);
               }}
               className={cn(
-                "rounded-full px-3 py-1 text-xs",
+                "shrink-0 rounded-full px-2.5 py-1 text-xs",
                 sort === s.key
                   ? "bg-ink text-white"
                   : "text-zinc-500 hover:bg-zinc-100",
@@ -197,6 +189,19 @@ function ProductsInner() {
           ))}
         </div>
       </div>
+
+      {/* 색상 필터 모달 */}
+      {filterOpen && (
+        <ColorFilterModal
+          selected={color}
+          onSelect={(c) => {
+            setColor(c);
+            setPage(1);
+            setFilterOpen(false);
+          }}
+          onClose={() => setFilterOpen(false)}
+        />
+      )}
 
       {loading ? (
         <Grid>
@@ -254,6 +259,75 @@ function Grid({ children }: { children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {children}
+    </div>
+  );
+}
+
+/** 색상 선택 모달 (필터 아이콘 클릭 시) */
+function ColorFilterModal({
+  selected,
+  onSelect,
+  onClose,
+}: {
+  selected: string | null;
+  onSelect: (color: string | null) => void;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 sm:items-center"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-md rounded-t-2xl bg-white p-6 sm:rounded-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-base font-bold text-ink">색상</h3>
+          <button
+            onClick={() => onSelect(null)}
+            className="text-xs text-zinc-400 underline hover:text-zinc-600"
+          >
+            초기화
+          </button>
+        </div>
+
+        <div className="grid grid-cols-5 gap-x-2 gap-y-4 sm:grid-cols-7">
+          {COLORS.map((c) => {
+            const active = selected === c.label;
+            return (
+              <button
+                key={c.label}
+                onClick={() => onSelect(active ? null : c.label)}
+                className="flex flex-col items-center gap-1"
+              >
+                <span
+                  className={cn(
+                    "h-9 w-9 rounded-full ring-1 ring-black/10 transition",
+                    active && "ring-2 ring-ink ring-offset-2",
+                  )}
+                  style={{ backgroundColor: c.hex }}
+                />
+                <span
+                  className={cn(
+                    "text-[11px]",
+                    active ? "font-semibold text-ink" : "text-zinc-500",
+                  )}
+                >
+                  {c.label}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={onClose}
+          className="mt-6 h-11 w-full rounded-xl bg-ink text-sm font-semibold text-white"
+        >
+          닫기
+        </button>
+      </div>
     </div>
   );
 }

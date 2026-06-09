@@ -9,7 +9,7 @@ import { useMe } from "@/hooks/useUser";
 import { useT } from "@/hooks/useT";
 import { useDiagnosisStore } from "@/store/diagnosis";
 import { seasonContent, seasonTheme } from "@/lib/personalColor";
-import { cn } from "@/lib/utils";
+import { cn, dedupeById } from "@/lib/utils";
 
 const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
 
@@ -64,6 +64,7 @@ export default function RecommendPage() {
 
   const content = seasonContent(season, locale);
   const th = seasonTheme(season);
+  const items = dedupeById(data?.items ?? []);
   const total = data?.meta.total ?? 0;
   const limit = data?.meta.limit ?? 30;
   const totalPages = Math.max(1, Math.ceil(total / limit));
@@ -125,14 +126,14 @@ export default function RecommendPage() {
             />
           ))}
         </Grid>
-      ) : !data || data.items.length === 0 ? (
+      ) : items.length === 0 ? (
         <p className="py-20 text-center text-sm text-zinc-400">
           추천할 상품이 없어요.
         </p>
       ) : (
         <>
           <Grid>
-            {data.items.map((p) => (
+            {items.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
           </Grid>

@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { productsApi } from "@/lib/api";
 import { qk } from "@/lib/query/keys";
+import { dedupeById } from "@/lib/utils";
 import type { ProductListQuery } from "@/types";
 
 export function useProducts(
@@ -37,7 +38,7 @@ export function useAllProducts(
         items.push(...res.items);
         if (items.length >= res.meta.total || res.items.length < limit) break;
       }
-      return items;
+      return dedupeById(items);
     },
   });
 }

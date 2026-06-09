@@ -80,3 +80,9 @@ export const ClockIcon = (p: IconProps) => (
     <path d="M12 7v5l3 2" />
   </svg>
 );
+
+export const FilterIcon = (p: IconProps) => (
+  <svg {...base(p)} width={18} height={18}>
+    <path d="M3 5h18M6 12h12M10 19h4" />
+  </svg>
+);

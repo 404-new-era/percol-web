@@ -32,7 +32,7 @@ export function CategoryNav() {
   const season = me?.latestDiagnosis?.season;
   const underlineColor = season
     ? seasonTheme(season).accent
-    : "var(--color-brand)";
+    : "var(--color-ink)";
   return (
     <nav className="mx-auto flex w-full max-w-5xl items-center gap-4 px-4 pb-2 text-sm">
       <button className="flex items-center gap-1 font-medium text-ink">

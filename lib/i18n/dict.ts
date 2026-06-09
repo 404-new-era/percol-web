@@ -75,7 +75,7 @@ export const DICT = {
         loading: "문항을 불러오는 중…",
         loadError: "문항을 불러오지 못했어요.",
       },
-      face: { choose: "사진 선택" },
+      face: { choose: "앨범에서 선택", camera: "직접 촬영" },
       submitError: "채점에 실패했어요. 잠시 후 다시 시도해주세요.",
     },
     result: {
@@ -207,7 +207,7 @@ export const DICT = {
         loading: "Loading questions…",
         loadError: "Couldn't load the questions.",
       },
-      face: { choose: "Choose photo" },
+      face: { choose: "Choose from album", camera: "Take a photo" },
       submitError: "Scoring failed. Please try again shortly.",
     },
     result: {

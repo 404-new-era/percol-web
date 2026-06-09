@@ -3,6 +3,7 @@
 import { ProductCard } from "@/components/product/ProductCard";
 import { useMe } from "@/hooks/useUser";
 import { useProducts } from "@/hooks/useProducts";
+import { dedupeById } from "@/lib/utils";
 import type { Season, Tone } from "@/types";
 
 /**
@@ -36,7 +37,7 @@ export function RecommendGrid({
       </Grid>
     );
 
-  const items = data?.items ?? [];
+  const items = dedupeById(data?.items ?? []);
   if (items.length === 0)
     return (
       <p className="py-10 text-center text-sm text-zinc-400">

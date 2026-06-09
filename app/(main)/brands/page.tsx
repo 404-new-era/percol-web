@@ -2,106 +2,167 @@
 
 import { useMemo, useState } from "react";
 import { ProductCard } from "@/components/product/ProductCard";
-import { useAllProducts } from "@/hooks/useProducts";
-import { cn } from "@/lib/utils";
+import { SearchIcon } from "@/components/ui/icons";
+import { useAllProducts, useProducts } from "@/hooks/useProducts";
+import { cn, dedupeById } from "@/lib/utils";
 
-/** 브랜드 로고 (있는 브랜드만) */
+/** 로고 있는 브랜드 */
 const BRAND_LOGOS: Record<string, string> = {
   유니클로: "/assets/brands/uniqlo.png",
+  탑텐: "/assets/brands/topten.jpg",
 };
-
+/** 상단 고정 브랜드 (오래돼서 샘플에 안 잡혀도 항상 노출) */
+const FEATURED = ["유니클로", "탑텐"];
 const PAGE_SIZE = 40;
 
-/** 브랜드 페이지 — 브랜드별로 분리해서 옷 보기 */
+/** 브랜드 페이지 — featured + 검색 + 목록, 선택 브랜드 상품 보기 */
 export default function BrandsPage() {
-  // 브랜드 목록 + 상품을 한 번에 (샘플 8페이지)
-  const { data, isLoading } = useAllProducts(undefined, { maxPages: 8 });
-  const [selected, setSelected] = useState<string | null>(null);
+  // 브랜드 목록용 샘플 (10페이지=500개, 191개 브랜드 대부분 포함)
+  const { data: sample } = useAllProducts(undefined, { maxPages: 10 });
+  const [query, setQuery] = useState("");
+  const [brand, setBrand] = useState("유니클로");
   const [page, setPage] = useState(1);
 
   const brands = useMemo(() => {
     const m = new Map<string, number>();
-    (data ?? []).forEach((p) => m.set(p.brand, (m.get(p.brand) ?? 0) + 1));
+    (sample ?? []).forEach((p) => m.set(p.brand, (m.get(p.brand) ?? 0) + 1));
     return [...m.entries()]
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count);
-  }, [data]);
+  }, [sample]);
 
-  const active = selected ?? brands[0]?.name ?? null;
-  const products = useMemo(
-    () => (data ?? []).filter((p) => p.brand === active),
-    [data, active],
-  );
-  const totalPages = Math.max(1, Math.ceil(products.length / PAGE_SIZE));
-  const pageItems = products.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const q = query.trim();
+  const listed = q ? brands.filter((b) => b.name.includes(q)) : brands;
 
-  if (isLoading)
-    return (
-      <div className="flex flex-1 items-center justify-center py-24 text-sm text-zinc-400">
-        브랜드를 불러오는 중…
-      </div>
-    );
+  // 선택 브랜드 상품 (keyword=브랜드, 서버 페이징)
+  const { data, isLoading } = useProducts({
+    keyword: brand,
+    page,
+    limit: PAGE_SIZE,
+  });
+  const items = dedupeById(data?.items ?? []);
+  const total = data?.meta.total ?? 0;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const pick = (name: string) => {
+    setBrand(name);
+    setPage(1);
+  };
 
   return (
     <div className="py-6 pb-16">
       <h1 className="mb-4 text-lg font-bold text-ink">브랜드</h1>
 
-      {/* 브랜드 선택 */}
-      <div className="mb-6 flex flex-wrap gap-2">
-        {brands.map((b) => {
-          const isActive = active === b.name;
-          const logo = BRAND_LOGOS[b.name];
+      {/* featured */}
+      <div className="mb-4 flex gap-2">
+        {FEATURED.map((name) => {
+          const active = brand === name;
+          const logo = BRAND_LOGOS[name];
           return (
             <button
-              key={b.name}
-              onClick={() => {
-                setSelected(b.name);
-                setPage(1);
-              }}
+              key={name}
+              onClick={() => pick(name)}
               className={cn(
-                "flex h-12 items-center gap-2 rounded-xl border px-4 transition",
-                isActive
+                "flex h-14 flex-1 items-center justify-center rounded-xl border transition",
+                active
                   ? "border-ink bg-ink/[0.03]"
                   : "border-zinc-200 hover:border-zinc-300",
               )}
             >
               {logo ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={logo} alt={b.name} className="h-5 w-auto object-contain" />
+                <img
+                  src={logo}
+                  alt={name}
+                  className="h-6 w-auto object-contain"
+                />
               ) : (
-                <span className="text-sm font-semibold text-ink">{b.name}</span>
+                <span className="text-base font-bold text-ink">{name}</span>
               )}
-              <span className="text-xs text-zinc-400">{b.count}</span>
             </button>
           );
         })}
       </div>
 
-      {/* 선택 브랜드 상품 */}
-      {active && (
-        <>
-          <div className="mb-3 flex items-center gap-2">
-            {BRAND_LOGOS[active] ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={BRAND_LOGOS[active]}
-                alt={active}
-                className="h-6 w-auto object-contain"
-              />
-            ) : (
-              <h2 className="text-base font-bold text-ink">{active}</h2>
-            )}
-            <span className="text-sm text-zinc-400">
-              {products.length.toLocaleString()}개
-            </span>
-          </div>
+      {/* 검색 */}
+      <div className="relative mb-3">
+        <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="브랜드 검색"
+          className="h-10 w-full rounded-xl bg-zinc-100 pl-4 pr-10 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
+        />
+        <SearchIcon className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+      </div>
 
-          <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {pageItems.map((p) => (
+      {/* 브랜드 목록 (스크롤) */}
+      <div className="mb-6 flex max-h-32 flex-wrap gap-1.5 overflow-y-auto">
+        {listed.map((b) => (
+          <button
+            key={b.name}
+            onClick={() => pick(b.name)}
+            className={cn(
+              "rounded-full px-3 py-1.5 text-xs transition",
+              brand === b.name
+                ? "bg-ink text-white"
+                : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200",
+            )}
+          >
+            {b.name}{" "}
+            <span
+              className={brand === b.name ? "text-white/60" : "text-zinc-400"}
+            >
+              {b.count}
+            </span>
+          </button>
+        ))}
+        {q && listed.length === 0 && (
+          <button
+            onClick={() => pick(q)}
+            className="rounded-full bg-zinc-100 px-3 py-1.5 text-xs text-zinc-600"
+          >
+            “{q}” 검색
+          </button>
+        )}
+      </div>
+
+      {/* 선택 브랜드 상품 */}
+      <div className="mb-3 flex items-center gap-2">
+        {BRAND_LOGOS[brand] ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={BRAND_LOGOS[brand]}
+            alt={brand}
+            className="h-6 w-auto object-contain"
+          />
+        ) : (
+          <h2 className="text-base font-bold text-ink">{brand}</h2>
+        )}
+        <span className="text-sm text-zinc-400">
+          {total.toLocaleString()}개
+        </span>
+      </div>
+
+      {isLoading ? (
+        <Grid>
+          {Array.from({ length: 10 }).map((_, i) => (
+            <div
+              key={i}
+              className="aspect-[3/4] animate-pulse rounded-lg bg-zinc-100"
+            />
+          ))}
+        </Grid>
+      ) : items.length === 0 ? (
+        <p className="py-16 text-center text-sm text-zinc-400">
+          상품이 없어요.
+        </p>
+      ) : (
+        <>
+          <Grid>
+            {items.map((p) => (
               <ProductCard key={p.id} product={p} />
             ))}
-          </div>
-
+          </Grid>
           {totalPages > 1 && (
             <div className="mt-10 flex items-center justify-center gap-3 text-sm">
               <button
@@ -125,6 +186,14 @@ export default function BrandsPage() {
           )}
         </>
       )}
+    </div>
+  );
+}
+
+function Grid({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+      {children}
     </div>
   );
 }

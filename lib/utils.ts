@@ -5,6 +5,16 @@ export function cn(...classes: Array<string | false | null | undefined>) {
   return classes.filter(Boolean).join(" ");
 }
 
+/** id 기준 중복 제거 (백엔드 페이지 경계 중복 대응) */
+export function dedupeById<T extends { id: string }>(items: T[]): T[] {
+  const seen = new Set<string>();
+  return items.filter((it) => {
+    if (seen.has(it.id)) return false;
+    seen.add(it.id);
+    return true;
+  });
+}
+
 /** 업로드 이미지 경로(/uploads/x.jpg 또는 절대URL)를 절대 URL로 정규화 */
 export function imageUrl(path: string | null | undefined): string | undefined {
   if (!path) return undefined;
