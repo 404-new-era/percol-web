@@ -23,7 +23,7 @@ export default function HomePage() {
         <SectionHeader
           title={t("home.recommendTitle")}
           subtitle={t("home.recommendSub")}
-          moreHref="/products"
+          moreHref="/products/recommend"
         />
         <RecommendGrid />
       </section>
