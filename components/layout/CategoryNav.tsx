@@ -6,15 +6,21 @@ import { cn } from "@/lib/utils";
 import { MenuIcon } from "@/components/ui/icons";
 import { useT } from "@/hooks/useT";
 
-/** 카테고리 | 추천 랭킹 세일 진단 스냅 브랜드 (목업 기준) */
+/** 카테고리 | 추천 랭킹 세일 진단 스냅 브랜드 (목업 기준) — 각 탭 고유 경로 */
 const NAV = [
   { key: "nav.recommend", href: "/" },
-  { key: "nav.ranking", href: "/products?sort=recent" },
-  { key: "nav.sale", href: "/products" },
+  { key: "nav.ranking", href: "/products" },
+  { key: "nav.sale", href: "/sale" },
   { key: "nav.diagnosis", href: "/diagnosis" },
   { key: "nav.snap", href: "/posts" },
-  { key: "nav.brand", href: "/products" },
+  { key: "nav.brand", href: "/brands" },
 ];
+
+/** 정확 매칭 (자기 경로 또는 그 하위 경로일 때만 활성) */
+function isActive(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 export function CategoryNav() {
   const pathname = usePathname();
@@ -27,7 +33,7 @@ export function CategoryNav() {
       </button>
       <span className="h-3 w-px bg-zinc-200" />
       {NAV.map((item) => {
-        const active = item.href === "/" ? pathname === "/" : pathname.startsWith(item.href.split("?")[0]);
+        const active = isActive(pathname, item.href);
         return (
           <Link
             key={item.key}
