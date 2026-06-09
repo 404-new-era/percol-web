@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { HeartIcon, StarIcon } from "@/components/ui/icons";
 import { imageUrl } from "@/lib/utils";
@@ -26,12 +27,12 @@ export function ProductCard({
         style={{ backgroundColor: product.colorHex }}
       >
         {product.imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={imageUrl(product.imageUrl)}
+          <Image
+            src={imageUrl(product.imageUrl)!}
             alt={product.name}
-            loading="lazy"
-            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            fill
+            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
+            className="object-cover transition-transform group-hover:scale-105"
           />
         )}
         {likeCount != null && (

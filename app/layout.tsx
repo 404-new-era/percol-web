@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PerCol — 퍼스널 컬러",
+  title: "PerCol — 당신의 퍼스널 컬러는?",
   description: "내 퍼스널 컬러 진단부터 추천 코디까지",
 };
 

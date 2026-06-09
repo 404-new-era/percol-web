@@ -36,6 +36,7 @@ export const DICT = {
       recommendTitle: "추천 아이템",
       recommendSub: "내 퍼스널 컬러에 어울리는 색감으로 골랐어요",
       snapTitle: "코디 스냅",
+      newTitle: "방금 들어온 신상품",
       onboarding: {
         kicker: "처음이신가요?",
         title: "아직 내 퍼스널 컬러를\n몰라요?",
@@ -87,6 +88,7 @@ export const DICT = {
       sister: "자매 시즌",
       avoid: "피할 시즌",
       seeRecommend: "맞춤 추천 보러가기",
+      share: "결과 공유",
       notFound: "결과를 찾을 수 없어요.",
     },
     profile: {
@@ -168,6 +170,7 @@ export const DICT = {
       recommendTitle: "Recommended",
       recommendSub: "Picked to match your personal color",
       snapTitle: "Style Snaps",
+      newTitle: "Just In",
       onboarding: {
         kicker: "New here?",
         title: "You haven't found your\npersonal color yet",
@@ -219,6 +222,7 @@ export const DICT = {
       sister: "Sister season",
       avoid: "Avoid",
       seeRecommend: "See my recommendations",
+      share: "Share",
       notFound: "Result not found.",
     },
     profile: {

@@ -8,6 +8,10 @@ const BACKEND_ORIGIN =
   process.env.BACKEND_ORIGIN ?? "https://43.201.8.235.sslip.io";
 
 const nextConfig: NextConfig = {
+  // 외부 상품 이미지 최적화(리사이즈·WebP) → 로딩 속도 개선
+  images: {
+    remotePatterns: [{ protocol: "https", hostname: "**" }],
+  },
   /**
    * 같은 출처(/api/v1, /uploads)로 들어온 요청을 백엔드로 프록시.
    * → 브라우저는 same-origin 호출이라 CORS가 발생하지 않음.

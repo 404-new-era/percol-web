@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { ProductCard } from "@/components/product/ProductCard";
 import { SearchIcon } from "@/components/ui/icons";
-import { useAllProducts, useProducts } from "@/hooks/useProducts";
+import { useAllProducts } from "@/hooks/useProducts";
 import { cn, dedupeById } from "@/lib/utils";
 
 /** 로고 있는 브랜드 */
@@ -34,15 +34,18 @@ export default function BrandsPage() {
   const q = query.trim();
   const listed = q ? brands.filter((b) => b.name.includes(q)) : brands;
 
-  // 선택 브랜드 상품 (keyword=브랜드, 서버 페이징)
-  const { data, isLoading } = useProducts({
-    keyword: brand,
-    page,
-    limit: PAGE_SIZE,
-  });
-  const items = dedupeById(data?.items ?? []);
-  const total = data?.meta.total ?? 0;
+  // 선택 브랜드 상품: keyword로 받아 정확 브랜드만 (substring 매칭 "클로→유니클로" 방지)
+  const { data: brandAll, isLoading } = useAllProducts(
+    { keyword: brand },
+    { maxPages: 20 },
+  );
+  const matched = useMemo(
+    () => dedupeById((brandAll ?? []).filter((p) => p.brand === brand)),
+    [brandAll, brand],
+  );
+  const total = matched.length;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  const items = matched.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   const pick = (name: string) => {
     setBrand(name);
@@ -108,12 +111,7 @@ export default function BrandsPage() {
                 : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200",
             )}
           >
-            {b.name}{" "}
-            <span
-              className={brand === b.name ? "text-white/60" : "text-zinc-400"}
-            >
-              {b.count}
-            </span>
+            {b.name}
           </button>
         ))}
         {q && listed.length === 0 && (

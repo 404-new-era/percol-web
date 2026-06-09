@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { RecommendGrid } from "@/components/home/RecommendGrid";
+import { ShareButton } from "@/components/ui/ShareButton";
 import { seasonContent, seasonKR, seasonTheme } from "@/lib/personalColor";
 import { useT } from "@/hooks/useT";
 import type { DiagnosisResult } from "@/types";
@@ -37,6 +38,20 @@ export function ResultView({
         {content.tagline} · {t("result.accuracy")}{" "}
         {Math.round(result.confidence * 100)}%
       </p>
+
+      <div className="mt-3 flex justify-center">
+        <ShareButton
+          label={t("result.share")}
+          title="PerCol"
+          text={`내 퍼스널 컬러는 "${content.labelKR}"! 너도 측정해봐`}
+          url={
+            typeof window !== "undefined"
+              ? `${window.location.origin}/diagnosis`
+              : "/diagnosis"
+          }
+          className="rounded-full border border-zinc-200 px-4 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-50"
+        />
+      </div>
 
       {/* 색상환 burst + 얼굴 */}
       <div className="relative mx-auto mt-7 h-56 w-56">
