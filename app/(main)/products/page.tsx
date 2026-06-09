@@ -1,7 +1,7 @@
 "use client";
 
-import { Suspense, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product/ProductCard";
 import { SearchIcon } from "@/components/ui/icons";
 import { useProducts } from "@/hooks/useProducts";
@@ -16,15 +16,23 @@ const SORTS: { key: ProductSort; label: string }[] = [
 ];
 
 function ProductsInner() {
-  const router = useRouter();
   const sp = useSearchParams();
 
   // URL 쿼리에서 초기값 (헤더 검색 등으로 진입 시)
   const [category, setCategory] = useState(sp.get("category") ?? "전체");
-  const [keyword, setKeyword] = useState(sp.get("keyword") ?? "");
   const [input, setInput] = useState(sp.get("keyword") ?? "");
+  const [keyword, setKeyword] = useState(sp.get("keyword") ?? "");
   const [sort, setSort] = useState<ProductSort>("recent");
   const [page, setPage] = useState(1);
+
+  // 엔터 없이 실시간 검색 — 입력 멈추면 300ms 뒤 자동 반영
+  useEffect(() => {
+    const id = setTimeout(() => {
+      setKeyword(input.trim());
+      setPage(1);
+    }, 300);
+    return () => clearTimeout(id);
+  }, [input]);
 
   const { data, isLoading, isError, isFetching } = useProducts({
     category: category === "전체" ? undefined : category,
@@ -39,34 +47,30 @@ function ProductsInner() {
   const totalPages = Math.max(1, Math.ceil(total / limit));
 
   const reset = () => setPage(1);
-  const submitSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    setKeyword(input.trim());
-    reset();
-    const url = input.trim()
-      ? `/products?keyword=${encodeURIComponent(input.trim())}`
-      : "/products";
-    router.replace(url);
-  };
 
   return (
     <div className="py-6 pb-16">
-      {/* 검색 */}
-      <form onSubmit={submitSearch} className="relative mb-4">
+      {/* 검색 (입력 즉시 필터) */}
+      <div className="relative mb-4">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="상품명, 브랜드 검색"
           className="h-11 w-full rounded-xl bg-zinc-100 pl-4 pr-11 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
         />
-        <button
-          type="submit"
-          aria-label="검색"
-          className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-ink"
-        >
-          <SearchIcon />
-        </button>
-      </form>
+        {input ? (
+          <button
+            type="button"
+            aria-label="지우기"
+            onClick={() => setInput("")}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-lg text-zinc-400 hover:text-ink"
+          >
+            ×
+          </button>
+        ) : (
+          <SearchIcon className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+        )}
+      </div>
 
       {/* 카테고리 탭 */}
       <div className="mb-4 flex gap-2 overflow-x-auto pb-1">

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { RecommendGrid } from "@/components/home/RecommendGrid";
 import { seasonContent, seasonKR, seasonTheme } from "@/lib/personalColor";
 import { useT } from "@/hooks/useT";
 import type { DiagnosisResult } from "@/types";
@@ -95,8 +96,17 @@ export function ResultView({
         </span>
       </div>
 
+      {/* 내 퍼스널 컬러에 어울리는 옷 추천 */}
+      <div className="mt-10 text-left">
+        <h2 className="mb-1 text-base font-bold text-ink">
+          {t("result.recommendTitle")}
+        </h2>
+        <p className="mb-4 text-xs text-zinc-500">{t("result.recommendSub")}</p>
+        <RecommendGrid season={result.season} tone={result.tone} limit={6} />
+      </div>
+
       {/* CTA */}
-      <div className="mt-8 flex justify-center gap-3">
+      <div className="mt-10 flex justify-center gap-3">
         <Link
           href="/products/recommend"
           className="inline-flex h-11 items-center rounded-full bg-ink px-6 text-sm font-semibold text-white hover:opacity-90"

@@ -3,21 +3,31 @@
 import { ProductCard } from "@/components/product/ProductCard";
 import { useMe } from "@/hooks/useUser";
 import { useProducts } from "@/hooks/useProducts";
+import type { Season, Tone } from "@/types";
 
 /**
- * 홈 추천 아이템 그리드.
- * 로그인 + 진단 있으면 내 시즌/톤으로 필터, 아니면 일반 목록.
+ * 시즌/톤에 맞는 상품 그리드.
+ * - season/tone prop 주면 그걸로 (결과 페이지 등, 비로그인도 동작)
+ * - 없으면 로그인 사용자의 latestDiagnosis로, 그것도 없으면 일반 목록
  */
-export function RecommendGrid() {
+export function RecommendGrid({
+  season: seasonProp,
+  tone: toneProp,
+  limit = 10,
+}: {
+  season?: Season;
+  tone?: Tone;
+  limit?: number;
+}) {
   const { data: me } = useMe();
-  const season = me?.latestDiagnosis?.season;
-  const tone = me?.latestDiagnosis?.tone;
-  const { data, isLoading } = useProducts({ season, tone, limit: 10 });
+  const season = seasonProp ?? me?.latestDiagnosis?.season;
+  const tone = toneProp ?? me?.latestDiagnosis?.tone;
+  const { data, isLoading } = useProducts({ season, tone, limit });
 
   if (isLoading)
     return (
       <Grid>
-        {Array.from({ length: 5 }).map((_, i) => (
+        {Array.from({ length: Math.min(limit, 5) }).map((_, i) => (
           <div
             key={i}
             className="aspect-[3/4] animate-pulse rounded-lg bg-zinc-100"
