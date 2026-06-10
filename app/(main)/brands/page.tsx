@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ProductCard } from "@/components/product/ProductCard";
 import { SearchIcon } from "@/components/ui/icons";
 import { useAllProducts } from "@/hooks/useProducts";
@@ -16,11 +17,12 @@ const FEATURED = ["유니클로", "탑텐"];
 const PAGE_SIZE = 40;
 
 /** 브랜드 페이지 — featured + 검색 + 목록, 선택 브랜드 상품 보기 */
-export default function BrandsPage() {
+function BrandsInner() {
+  const sp = useSearchParams();
   // 브랜드 목록용 샘플 (10페이지=500개, 191개 브랜드 대부분 포함)
   const { data: sample } = useAllProducts(undefined, { maxPages: 10 });
   const [query, setQuery] = useState("");
-  const [brand, setBrand] = useState("유니클로");
+  const [brand, setBrand] = useState(sp.get("brand") ?? "유니클로");
   const [page, setPage] = useState(1);
 
   const brands = useMemo(() => {
@@ -197,5 +199,13 @@ function Grid({ children }: { children: React.ReactNode }) {
     <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
       {children}
     </div>
+  );
+}
+
+export default function BrandsPage() {
+  return (
+    <Suspense fallback={<div className="py-24" />}>
+      <BrandsInner />
+    </Suspense>
   );
 }

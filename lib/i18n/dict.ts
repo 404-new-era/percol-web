@@ -38,6 +38,7 @@ export const DICT = {
       recommendSub: "내 퍼스널 컬러에 어울리는 색감으로 골랐어요",
       snapTitle: "코디 스냅",
       newTitle: "방금 들어온 신상품",
+      brandTitle: "이런 브랜드는 어때요?",
       onboarding: {
         kicker: "처음이신가요?",
         title: "아직 내 퍼스널 컬러를\n몰라요?",
@@ -101,8 +102,8 @@ export const DICT = {
       noDiagnosisSub: "지금 진단하고 내 색을 찾아보세요",
       statDiagnosis: "진단",
       statPost: "코디",
-      statBookmark: "북마크",
-      menuBookmark: "북마크",
+      statBookmark: "찜",
+      menuBookmark: "찜한 상품",
       menuHistory: "진단 기록",
       menuPublic: "공개 프로필 보기",
       logout: "로그아웃",
@@ -174,6 +175,7 @@ export const DICT = {
       recommendSub: "Picked to match your personal color",
       snapTitle: "Style Snaps",
       newTitle: "Just In",
+      brandTitle: "Brands you might like",
       onboarding: {
         kicker: "New here?",
         title: "You haven't found your\npersonal color yet",

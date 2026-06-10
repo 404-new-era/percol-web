@@ -21,7 +21,7 @@ function BookmarksContent() {
 
   return (
     <div className="py-6 pb-16">
-      <h1 className="mb-4 text-lg font-bold text-ink">북마크</h1>
+      <h1 className="mb-4 text-lg font-bold text-ink">찜한 상품</h1>
 
       {isLoading ? (
         <Grid>

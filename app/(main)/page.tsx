@@ -3,7 +3,7 @@
 import { DiagnosisBanner } from "@/components/home/DiagnosisBanner";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { RecommendGrid } from "@/components/home/RecommendGrid";
-import { NewArrivals } from "@/components/home/NewArrivals";
+import { BrandSuggest } from "@/components/home/BrandSuggest";
 import { SnapCard } from "@/components/post/SnapCard";
 import { MOCK_SNAPS } from "@/lib/mock";
 import { useT } from "@/hooks/useT";
@@ -43,8 +43,8 @@ export default function HomePage() {
       </section>
 
       <section className="mt-12">
-        <SectionHeader title={t("home.newTitle")} moreHref="/products" />
-        <NewArrivals />
+        <SectionHeader title={t("home.brandTitle")} moreHref="/brands" />
+        <BrandSuggest />
       </section>
     </div>
   );
