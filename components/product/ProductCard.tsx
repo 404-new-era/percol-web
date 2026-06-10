@@ -9,17 +9,16 @@ interface ProductCardProps {
   rating?: number;
   reviewCount?: number;
   likeCount?: number;
-  discountRate?: number;
 }
 
-/** 추천/목록 상품 카드 — 실제 이미지 + 브랜드/상품명/가격, 상세로 링크 */
+/** 추천/목록 상품 카드 — 실제 이미지 + 브랜드/상품명/가격(세일 표시), 상세로 링크 */
 export function ProductCard({
   product,
   rating,
   reviewCount,
   likeCount,
-  discountRate,
 }: ProductCardProps) {
+  const onSale = product.discountRate != null && product.discountRate > 0;
   return (
     <Link href={`/products/${product.id}`} className="group flex flex-col">
       <div
@@ -47,12 +46,17 @@ export function ProductCard({
       <p className="line-clamp-1 text-xs text-zinc-500">{product.name}</p>
 
       <p className="mt-1 flex items-center gap-1 text-sm font-bold">
-        {discountRate != null && (
-          <span className="text-[#e8402e]">{discountRate}%</span>
+        {onSale && (
+          <span className="text-[#e8402e]">{product.discountRate}%</span>
         )}
         <span className="text-zinc-900">
           {product.price.toLocaleString("ko-KR")}
         </span>
+        {onSale && product.originalPrice != null && (
+          <span className="text-xs font-normal text-zinc-400 line-through">
+            {product.originalPrice.toLocaleString("ko-KR")}
+          </span>
+        )}
       </p>
 
       {rating != null && (

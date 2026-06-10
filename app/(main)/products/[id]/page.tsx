@@ -46,9 +46,27 @@ export default function ProductDetailPage({
         <div className="flex flex-col">
           <p className="text-sm text-zinc-500">{product.brand}</p>
           <h1 className="mt-1 text-xl font-bold text-ink">{product.name}</h1>
-          <p className="mt-3 text-2xl font-extrabold">
-            {product.price.toLocaleString("ko-KR")}원
-          </p>
+          {product.discountRate != null && product.discountRate > 0 ? (
+            <div className="mt-3">
+              <p className="flex items-baseline gap-2">
+                <span className="text-2xl font-extrabold text-[#e8402e]">
+                  {product.discountRate}%
+                </span>
+                <span className="text-2xl font-extrabold">
+                  {product.price.toLocaleString("ko-KR")}원
+                </span>
+              </p>
+              {product.originalPrice != null && (
+                <p className="text-sm text-zinc-400 line-through">
+                  {product.originalPrice.toLocaleString("ko-KR")}원
+                </p>
+              )}
+            </div>
+          ) : (
+            <p className="mt-3 text-2xl font-extrabold">
+              {product.price.toLocaleString("ko-KR")}원
+            </p>
+          )}
 
           <div className="mt-4 flex items-center gap-2 text-sm text-zinc-500">
             <span

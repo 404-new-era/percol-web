@@ -13,6 +13,7 @@ const NAV = [
   { key: "nav.home", href: "/" },
   { key: "nav.recommend", href: "/products/recommend" },
   { key: "nav.ranking", href: "/products" },
+  { key: "nav.sale", href: "/sale" },
   { key: "nav.diagnosis", href: "/diagnosis" },
   { key: "nav.snap", href: "/posts" },
   { key: "nav.brand", href: "/brands" },

@@ -10,12 +10,19 @@ export interface Product {
   id: string;
   name: string;
   brand: string;
+  /** 출처(브랜드 구분용, 예: TOPTEN/UNIQLO) */
+  source?: string;
   category: string;
   price: number;
+  /** 세일 시에만 — 정가 (아니면 null) */
+  originalPrice: number | null;
+  /** 세일 시에만 — 할인율 % (아니면 null) */
+  discountRate: number | null;
   imageUrl: string;
   productUrl: string;
   colorName: string;
   colorHex: string;
+  rank?: number;
   seasonTags: SeasonTag[];
 }
 
