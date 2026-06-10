@@ -17,6 +17,15 @@ export function useMe() {
   });
 }
 
+/** 공개 프로필 (GET /users/:nickname, 인증 불필요) */
+export function usePublicProfile(nickname: string) {
+  return useQuery({
+    queryKey: qk.users.profile(nickname),
+    queryFn: () => usersApi.publicProfile(nickname),
+    enabled: !!nickname,
+  });
+}
+
 /** 마이페이지 카운트 (게시물/북마크/진단) */
 export function useMyPage() {
   const { isAuthenticated } = useAuth();
