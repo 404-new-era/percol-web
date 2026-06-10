@@ -2,7 +2,10 @@
 
 import { use } from "react";
 import { Avatar } from "@/components/ui/Avatar";
+import { SnapFeedCard } from "@/components/post/SnapFeedCard";
+import { usePosts } from "@/hooks/usePosts";
 import { usePublicProfile } from "@/hooks/useUser";
+import { dedupeById } from "@/lib/utils";
 
 /** 공개 프로필 (GET /users/:nickname) */
 export default function PublicProfilePage({
@@ -13,6 +16,11 @@ export default function PublicProfilePage({
   const { nickname: raw } = use(params);
   const nickname = decodeURIComponent(raw);
   const { data, isLoading, isError } = usePublicProfile(nickname);
+  // 유저별 게시물 엔드포인트가 없어 피드에서 id로 필터
+  const { data: feed } = usePosts({ limit: 50 });
+  const myPosts = dedupeById(
+    (feed?.items ?? []).filter((p) => p.user.id === data?.id),
+  );
 
   if (isLoading)
     return (
@@ -57,9 +65,20 @@ export default function PublicProfilePage({
         </div>
       </div>
 
-      <p className="mt-12 text-center text-sm text-zinc-400">
-        아직 등록한 코디가 없어요.
-      </p>
+      {/* 코디 그리드 */}
+      <div className="mt-10 border-t border-zinc-100 pt-6">
+        {myPosts.length === 0 ? (
+          <p className="py-10 text-center text-sm text-zinc-400">
+            아직 등록한 코디가 없어요.
+          </p>
+        ) : (
+          <div className="columns-2 gap-4 sm:columns-3">
+            {myPosts.map((p) => (
+              <SnapFeedCard key={p.id} post={p} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
