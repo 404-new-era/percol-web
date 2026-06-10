@@ -65,7 +65,7 @@ export function CategoryNav() {
             {t(item.key)}
             {isActive && (
               <span
-                className="absolute -bottom-[3px] left-0 h-0.5 w-full rounded-full"
+                className="absolute -bottom-[3px] left-0 h-0.5 w-full rounded-full transition-colors duration-300"
                 style={{ backgroundColor: underlineColor }}
               />
             )}

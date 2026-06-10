@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ProductCard } from "@/components/product/ProductCard";
+import { useAuth } from "@/hooks/useAuth";
 import { useHydrated } from "@/hooks/useHydrated";
 import { useProducts } from "@/hooks/useProducts";
 import { useMe } from "@/hooks/useUser";
@@ -17,13 +18,17 @@ const PROMPT_SWATCH = ["#ff8d7a", "#f2a9c4", "#5b6b2f", "#1f3a5f"];
 export default function RecommendPage() {
   const mounted = useHydrated();
   const { t, locale } = useT();
-  const { data: me } = useMe();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { data: me, isLoading: meLoading } = useMe();
 
   const season = me?.latestDiagnosis?.season;
   const tone = me?.latestDiagnosis?.tone;
 
   const [category, setCategory] = useState("전체");
   const [page, setPage] = useState(1);
+
+  // 인증·내정보 확정 전엔 결정 보류 (진단 유도 카드 플래시 방지)
+  const resolving = !mounted || authLoading || (isAuthenticated && meLoading);
 
   const hasDiagnosis = !!season;
   const { data, isLoading, isFetching } = useProducts(
@@ -35,10 +40,10 @@ export default function RecommendPage() {
       page,
       limit: 30,
     },
-    { enabled: mounted },
+    { enabled: !resolving },
   );
 
-  if (!mounted) return <Centered>{t("common.loading")}</Centered>;
+  if (resolving) return <RecommendSkeleton />;
 
   const content = hasDiagnosis ? seasonContent(season, locale) : null;
   const th = hasDiagnosis ? seasonTheme(season) : null;
@@ -183,10 +188,27 @@ function Grid({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Centered({ children }: { children: React.ReactNode }) {
+/** 인증/내정보 확정 전 스켈레톤 (헤더 + 카테고리 + 그리드) */
+function RecommendSkeleton() {
   return (
-    <div className="flex flex-1 items-center justify-center py-24 text-sm text-zinc-400">
-      {children}
+    <div className="py-6 pb-16">
+      <div className="mb-5 h-12 w-48 animate-pulse rounded bg-zinc-100" />
+      <div className="mb-4 flex gap-2">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-8 w-14 animate-pulse rounded-full bg-zinc-100"
+          />
+        ))}
+      </div>
+      <Grid>
+        {Array.from({ length: 10 }).map((_, i) => (
+          <div
+            key={i}
+            className="aspect-[3/4] animate-pulse rounded-lg bg-zinc-100"
+          />
+        ))}
+      </Grid>
     </div>
   );
 }
