@@ -150,7 +150,7 @@ function Comments({ postId }: { postId: string }) {
 
   const submit = () => {
     const v = text.trim();
-    if (!v) return;
+    if (!v || add.isPending) return;
     ensureAuth(() => {
       add.mutate(v, { onSuccess: () => setText("") });
     }, "댓글은 로그인 후 작성할 수 있어요.");
@@ -193,7 +193,12 @@ function Comments({ postId }: { postId: string }) {
         <input
           value={text}
           onChange={(e) => setText(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && !e.nativeEvent.isComposing) {
+              e.preventDefault();
+              submit();
+            }
+          }}
           placeholder="댓글 달기…"
           className="h-10 flex-1 rounded-full bg-zinc-100 px-4 text-sm placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-200"
         />

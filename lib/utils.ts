@@ -15,10 +15,10 @@ export function dedupeById<T extends { id: string }>(items: T[]): T[] {
   });
 }
 
-/** 업로드 이미지 경로(/uploads/x.jpg 또는 절대URL)를 절대 URL로 정규화 */
+/** 업로드 이미지 경로(/uploads/x.jpg 또는 절대URL/dataURL)를 정규화 */
 export function imageUrl(path: string | null | undefined): string | undefined {
   if (!path) return undefined;
-  if (path.startsWith("http")) return path;
+  if (path.startsWith("http") || path.startsWith("data:")) return path;
   return `${config.uploadsBaseUrl}${path.startsWith("/") ? "" : "/"}${path}`;
 }
 

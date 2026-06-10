@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { ChevronRightIcon } from "@/components/ui/icons";
@@ -10,11 +9,11 @@ import { ProfileEditForm } from "./ProfileEditForm";
 import { useAuth } from "@/hooks/useAuth";
 import { useMe, useMyPage } from "@/hooks/useUser";
 import { useT } from "@/hooks/useT";
+import { useDiagnosisStore } from "@/store/diagnosis";
 import { seasonContent, seasonTheme } from "@/lib/personalColor";
 
 /** 마이페이지 — 로그인 사용자 */
 export function MyPage() {
-  const router = useRouter();
   const { t } = useT();
   const { logout } = useAuth();
   const { data: me, isLoading } = useMe();
@@ -30,7 +29,9 @@ export function MyPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/");
+    // 진단 결과 스토어 비우고, 캐시(이전 계정 me/퍼스널컬러) 초기화 위해 하드 리프레시
+    useDiagnosisStore.getState().clear();
+    window.location.href = "/";
   };
 
   return (

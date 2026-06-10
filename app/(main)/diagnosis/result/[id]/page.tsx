@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import { ResultView } from "@/components/diagnosis/ResultView";
 import { useDiagnosisRecord } from "@/hooks/useDiagnosis";
 import { useHydrated } from "@/hooks/useHydrated";
+import { useMe } from "@/hooks/useUser";
 import { useT } from "@/hooks/useT";
 import { useDiagnosisStore } from "@/store/diagnosis";
 
@@ -18,6 +19,7 @@ export default function DiagnosisResultPage() {
   const { id } = useParams<{ id: string }>();
   const { t } = useT();
   const { lastResult, faceUrl } = useDiagnosisStore();
+  const { data: me } = useMe();
 
   // sessionStorage 복원은 클라이언트에서만 → 하이드레이션 후 평가
   const mounted = useHydrated();
@@ -48,7 +50,9 @@ export default function DiagnosisResultPage() {
       </Centered>
     );
 
-  return <ResultView result={result} faceUrl={fromStore ? faceUrl ?? undefined : undefined} />;
+  // 진단 얼굴(스토어 dataURL) 우선, 없으면 로그인 프로필 사진
+  const face = (fromStore ? faceUrl : undefined) ?? me?.image ?? undefined;
+  return <ResultView result={result} faceUrl={face} />;
 }
 
 function Centered({ children }: { children: React.ReactNode }) {

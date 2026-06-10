@@ -5,6 +5,7 @@ import { RecommendGrid } from "@/components/home/RecommendGrid";
 import { ShareButton } from "@/components/ui/ShareButton";
 import { seasonContent, seasonKR, seasonTheme } from "@/lib/personalColor";
 import { useT } from "@/hooks/useT";
+import { imageUrl } from "@/lib/utils";
 import type { DiagnosisResult } from "@/types";
 
 /** 진단 결과 화면 (색상환 burst + 얼굴) */
@@ -13,11 +14,13 @@ export function ResultView({
   faceUrl,
 }: {
   result: DiagnosisResult;
+  /** 진단 얼굴(dataURL) 또는 프로필 사진 URL — 없으면 시즌 이니셜 */
   faceUrl?: string;
 }) {
   const { t, locale } = useT();
   const content = seasonContent(result.season, locale);
   const th = seasonTheme(result.season);
+  const face = imageUrl(faceUrl);
   const burstGradient = `conic-gradient(${content.burst
     .map(
       (c, i) =>
@@ -60,14 +63,18 @@ export function ResultView({
           style={{ background: burstGradient }}
         />
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="h-24 w-24 overflow-hidden rounded-full bg-white shadow-md ring-4 ring-white">
-            {faceUrl && (
+          <span className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-white shadow-md ring-4 ring-white">
+            {face ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
-                src={faceUrl}
+                src={face}
                 alt="face"
                 className="h-full w-full object-cover"
               />
+            ) : (
+              <span className="text-3xl font-bold" style={{ color: th.accent }}>
+                {seasonKR(result.season).charAt(0)}
+              </span>
             )}
           </span>
         </div>
