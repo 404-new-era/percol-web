@@ -78,18 +78,19 @@ export default function ProductDetailPage({
             {product.colorName}
           </div>
 
-          {product.seasonTags?.length > 0 && (
-            <div className="mt-4 flex flex-wrap gap-2">
-              {product.seasonTags.map((tag, i) => (
-                <span
-                  key={i}
-                  className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600"
-                >
-                  {seasonLabel(tag.season)} · {toneLabel(tag.tone)}톤
-                </span>
-              ))}
-            </div>
-          )}
+          <div className="mt-4 flex flex-wrap gap-2">
+            <span className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600">
+              {product.category}
+            </span>
+            {product.seasonTags?.map((tag, i) => (
+              <span
+                key={i}
+                className="rounded-full bg-zinc-100 px-3 py-1 text-xs font-medium text-zinc-600"
+              >
+                {seasonLabel(tag.season)} · {toneLabel(tag.tone)}톤
+              </span>
+            ))}
+          </div>
 
           <div className="mt-7 flex items-center gap-2">
             <BookmarkButton
@@ -113,9 +114,6 @@ export default function ProductDetailPage({
               구매하러 가기
             </a>
           </div>
-          <p className="mt-2 text-center text-xs text-zinc-400">
-            {product.category}
-          </p>
         </div>
       </div>
     </div>
