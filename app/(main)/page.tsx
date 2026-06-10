@@ -4,8 +4,7 @@ import { DiagnosisBanner } from "@/components/home/DiagnosisBanner";
 import { SectionHeader } from "@/components/home/SectionHeader";
 import { RecommendGrid } from "@/components/home/RecommendGrid";
 import { BrandSpotlight } from "@/components/home/BrandSpotlight";
-import { SnapCard } from "@/components/post/SnapCard";
-import { MOCK_SNAPS } from "@/lib/mock";
+import { HomeSnaps } from "@/components/home/HomeSnaps";
 import { useT } from "@/hooks/useT";
 
 /**
@@ -30,16 +29,7 @@ export default function HomePage() {
 
       <section className="mt-12">
         <SectionHeader title={t("home.snapTitle")} moreHref="/posts" />
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          {MOCK_SNAPS.map((s) => (
-            <SnapCard
-              key={s.id}
-              nickname={s.nickname}
-              coverHex={s.coverHex}
-              avatarHex={s.avatarHex}
-            />
-          ))}
-        </div>
+        <HomeSnaps />
       </section>
 
       <BrandSpotlight />
