@@ -7,21 +7,20 @@ import { useHydrated } from "@/hooks/useHydrated";
 import { useProducts } from "@/hooks/useProducts";
 import { useMe } from "@/hooks/useUser";
 import { useT } from "@/hooks/useT";
-import { useDiagnosisStore } from "@/store/diagnosis";
 import { seasonContent, seasonTheme } from "@/lib/personalColor";
 import { cn, dedupeById } from "@/lib/utils";
 
 const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
+const PROMPT_SWATCH = ["#ff8d7a", "#f2a9c4", "#5b6b2f", "#1f3a5f"];
 
-/** 맞춤 추천 — 내 퍼스널 컬러(시즌/톤)에 맞는 상품. 로그인 latestDiagnosis 또는 비로그인 결과(스토어) 기반 */
+/** 맞춤 추천 — 로그인 저장 진단(latestDiagnosis) 기반. 없으면 진단 유도 + 인기 상품 */
 export default function RecommendPage() {
   const mounted = useHydrated();
   const { t, locale } = useT();
   const { data: me } = useMe();
-  const lastResult = useDiagnosisStore((s) => s.lastResult);
 
-  const season = me?.latestDiagnosis?.season ?? lastResult?.season;
-  const tone = me?.latestDiagnosis?.tone ?? lastResult?.tone;
+  const season = me?.latestDiagnosis?.season;
+  const tone = me?.latestDiagnosis?.tone;
 
   const [category, setCategory] = useState("전체");
   const [page, setPage] = useState(1);
@@ -81,13 +80,18 @@ export default function RecommendPage() {
         <div className="mb-5">
           <Link
             href="/diagnosis"
-            className="flex items-center justify-between rounded-2xl bg-cream px-5 py-4 hover:opacity-95"
+            className="flex items-center gap-3 rounded-2xl border border-zinc-200 bg-white p-4 transition hover:border-zinc-300 hover:shadow-sm"
           >
-            <div>
-              <p className="text-sm font-bold text-[#4a3526]">
+            <span className="grid h-11 w-11 shrink-0 grid-cols-2 gap-0.5 overflow-hidden rounded-xl">
+              {PROMPT_SWATCH.map((c) => (
+                <span key={c} style={{ backgroundColor: c }} />
+              ))}
+            </span>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold text-ink">
                 {t("profile.noDiagnosisTitle")}
               </p>
-              <p className="mt-0.5 text-xs text-[#8a6c47]">
+              <p className="mt-0.5 truncate text-xs text-zinc-500">
                 {t("profile.noDiagnosisSub")}
               </p>
             </div>
