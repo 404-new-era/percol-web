@@ -48,9 +48,13 @@ export default function SalePage() {
       <h1 className="mb-1 text-lg font-bold text-ink">
         세일 <span className="text-[#e8402e]">SALE</span>
       </h1>
-      <p className="mb-4 text-xs text-zinc-500">
-        지금 할인 중인 상품 {total.toLocaleString()}개
-      </p>
+      {isLoading ? (
+        <div className="mb-4 h-3 w-40 animate-pulse rounded bg-zinc-200" />
+      ) : (
+        <p className="mb-4 text-xs text-zinc-500">
+          지금 할인 중인 상품 {total.toLocaleString()}개
+        </p>
+      )}
 
       {/* 카테고리 */}
       <div className="mb-3 flex gap-2 overflow-x-auto pb-1">

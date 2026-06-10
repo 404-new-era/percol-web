@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { HeartIcon, StarIcon } from "@/components/ui/icons";
+import { StarIcon } from "@/components/ui/icons";
+import { BookmarkButton } from "./BookmarkButton";
 import { imageUrl } from "@/lib/utils";
 import type { Product } from "@/types";
 
@@ -34,9 +35,13 @@ export function ProductCard({
             className="object-cover transition-transform group-hover:scale-105"
           />
         )}
+        <BookmarkButton
+          productId={product.id}
+          size={20}
+          className="absolute right-1.5 top-1.5 rounded-full bg-white/70 p-1.5 backdrop-blur hover:bg-white"
+        />
         {likeCount != null && (
           <span className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-black/30 px-2 py-0.5 text-[11px] font-medium text-white backdrop-blur">
-            <HeartIcon width={12} height={12} filled />
             {likeCount}
           </span>
         )}

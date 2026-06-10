@@ -45,7 +45,7 @@ export function ShareButton({
       className={cn("inline-flex items-center gap-1.5", className)}
     >
       <ShareIcon />
-      {copied ? "복사됨" : label}
+      <span>{copied ? "복사됨" : label}</span>
     </button>
   );
 }

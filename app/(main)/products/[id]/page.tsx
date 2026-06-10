@@ -1,6 +1,8 @@
 "use client";
 
 import { use } from "react";
+import { BookmarkButton } from "@/components/product/BookmarkButton";
+import { ShareButton } from "@/components/ui/ShareButton";
 import { useProduct } from "@/hooks/useProducts";
 import { imageUrl, seasonLabel, toneLabel } from "@/lib/utils";
 
@@ -89,14 +91,28 @@ export default function ProductDetailPage({
             </div>
           )}
 
-          <a
-            href={product.productUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-7 inline-flex h-12 items-center justify-center rounded-xl bg-ink text-sm font-semibold text-white hover:opacity-90"
-          >
-            구매하러 가기
-          </a>
+          <div className="mt-7 flex items-center gap-2">
+            <BookmarkButton
+              productId={product.id}
+              size={22}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-200 hover:bg-zinc-50"
+            />
+            <ShareButton
+              label="공유"
+              title={product.name}
+              text={`${product.brand} ${product.name}`}
+              url={product.productUrl}
+              className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-zinc-200 text-zinc-500 hover:bg-zinc-50 [&>span]:hidden"
+            />
+            <a
+              href={product.productUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex h-12 flex-1 items-center justify-center rounded-xl bg-ink text-sm font-semibold text-white hover:opacity-90"
+            >
+              구매하러 가기
+            </a>
+          </div>
           <p className="mt-2 text-center text-xs text-zinc-400">
             {product.category}
           </p>

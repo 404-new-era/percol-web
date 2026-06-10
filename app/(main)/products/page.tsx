@@ -210,9 +210,13 @@ function ProductsInner() {
         </button>
 
         <div className="flex items-center gap-2 overflow-x-auto">
-          <span className="shrink-0 text-xs text-zinc-400">
-            {total.toLocaleString()}개
-          </span>
+          {loading ? (
+            <span className="h-3 w-10 shrink-0 animate-pulse rounded bg-zinc-200" />
+          ) : (
+            <span className="shrink-0 text-xs text-zinc-400">
+              {total.toLocaleString()}개
+            </span>
+          )}
           {SORTS.map((s) => (
             <button
               key={s.key}

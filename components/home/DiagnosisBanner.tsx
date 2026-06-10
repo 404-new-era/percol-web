@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { CameraIcon } from "@/components/ui/icons";
+import { EyedropperOrb } from "./EyedropperOrb";
 import { useAuth } from "@/hooks/useAuth";
 import { useMe } from "@/hooks/useUser";
 import { useT } from "@/hooks/useT";
-import { orbBackground, seasonContent, seasonTheme } from "@/lib/personalColor";
+import { seasonContent, seasonTheme } from "@/lib/personalColor";
 import type { Season, Tone } from "@/types";
 
 /**
@@ -76,36 +77,14 @@ function ResultBanner({ season }: { season: Season; tone: Tone }) {
           </div>
         </div>
 
-        {/* 시즌 색으로 블렌딩한 컬러 오브 */}
-        <ColorOrb burst={content.burst} className="hidden sm:block" />
+        {/* 시즌 컬러 오브 (스포이드) */}
+        <EyedropperOrb
+          colors={content.burst}
+          size={160}
+          className="hidden shrink-0 sm:block"
+        />
       </div>
     </section>
-  );
-}
-
-function ColorOrb({
-  burst,
-  size = 160,
-  className,
-}: {
-  burst: string[];
-  size?: number;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`relative shrink-0 ${className ?? ""}`}
-      style={{ width: size, height: size }}
-    >
-      <div
-        className="absolute inset-0 rounded-full opacity-60 blur-2xl"
-        style={{ background: orbBackground(burst) }}
-      />
-      <div
-        className="absolute inset-0 rounded-full shadow-inner"
-        style={{ background: orbBackground(burst) }}
-      />
-    </div>
   );
 }
 
@@ -136,13 +115,11 @@ function OnboardingBanner() {
           </div>
         </div>
 
-        {/* 중립: '모든 색을 발견한다'는 의미의 무지개 원 */}
-        <div
-          className="hidden h-40 w-40 shrink-0 rounded-full sm:block"
-          style={{
-            background:
-              "conic-gradient(#ff8d7a,#ffd24c,#9acd32,#4cc9d6,#7d6bb0,#e83e8c,#ff8d7a)",
-          }}
+        {/* 중립: '모든 색을 발견한다' 무지개 오브 (스포이드) */}
+        <EyedropperOrb
+          colors={["#ff8d7a", "#ffd24c", "#9acd32", "#4cc9d6", "#7d6bb0", "#e83e8c"]}
+          size={160}
+          className="hidden shrink-0 sm:block"
         />
       </div>
     </section>

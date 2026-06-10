@@ -136,9 +136,13 @@ export default function BrandsPage() {
         ) : (
           <h2 className="text-base font-bold text-ink">{brand}</h2>
         )}
-        <span className="text-sm text-zinc-400">
-          {total.toLocaleString()}개
-        </span>
+        {isLoading ? (
+          <span className="h-3 w-10 animate-pulse rounded bg-zinc-200" />
+        ) : (
+          <span className="text-sm text-zinc-400">
+            {total.toLocaleString()}개
+          </span>
+        )}
       </div>
 
       {isLoading ? (

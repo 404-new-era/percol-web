@@ -63,7 +63,8 @@ export default function RecommendPage() {
               {content.labelKR}
             </h1>
             <p className="mt-0.5 text-xs text-zinc-500">
-              {content.tagline} · {total.toLocaleString()}개
+              {content.tagline}
+              {!isLoading && ` · ${total.toLocaleString()}개`}
             </p>
           </div>
           <div className="flex shrink-0 gap-1.5">
