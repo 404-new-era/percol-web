@@ -9,7 +9,10 @@ import { cn, dedupeById } from "@/lib/utils";
 import type { Product, ProductSort } from "@/types";
 
 const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
-const SORTS: { key: ProductSort; label: string }[] = [
+// "rank"는 백엔드 기본 정렬(정렬 파라미터 미전달) — 29CM 우선 노출
+type SortKey = "rank" | ProductSort;
+const SORTS: { key: SortKey; label: string }[] = [
+  { key: "rank", label: "추천순" },
   { key: "recent", label: "최신순" },
   { key: "price_asc", label: "낮은 가격순" },
   { key: "price_desc", label: "높은 가격순" },
@@ -89,7 +92,7 @@ function ProductsInner() {
   const [input, setInput] = useState(sp.get("keyword") ?? "");
   const [keyword, setKeyword] = useState(sp.get("keyword") ?? "");
   const [color, setColor] = useState<string | null>(null);
-  const [sort, setSort] = useState<ProductSort>("recent");
+  const [sort, setSort] = useState<SortKey>("rank");
   const [page, setPage] = useState(1);
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -105,7 +108,7 @@ function ProductsInner() {
   const baseFilter = {
     category: category === "전체" ? undefined : category,
     keyword: keyword || undefined,
-    sort,
+    sort: sort === "rank" ? undefined : sort,
   };
 
   // 색 선택 시: 전체 받아와 클라이언트 필터 / 아니면 서버 페이지네이션

@@ -31,7 +31,7 @@ export default function RecommendPage() {
       season,
       tone,
       category: category === "전체" ? undefined : category,
-      sort: hasDiagnosis ? undefined : "recent",
+      // 정렬 미전달 = 백엔드 기본(rank, 29CM 우선)
       page,
       limit: 30,
     },
