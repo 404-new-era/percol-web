@@ -94,6 +94,12 @@ export const LockIcon = (p: IconProps) => (
   </svg>
 );
 
+export const CommentIcon = (p: IconProps) => (
+  <svg {...base(p)} width={16} height={16}>
+    <path d="M21 11.5a8.5 8.5 0 0 1-12.3 7.6L3 21l1.9-5.7A8.5 8.5 0 1 1 21 11.5Z" />
+  </svg>
+);
+
 export const ShareIcon = (p: IconProps) => (
   <svg {...base(p)} width={16} height={16}>
     <circle cx="18" cy="5" r="3" />

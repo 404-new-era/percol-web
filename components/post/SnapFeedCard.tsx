@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Avatar } from "@/components/ui/Avatar";
-import { HeartIcon } from "@/components/ui/icons";
+import { CommentIcon, HeartIcon } from "@/components/ui/icons";
 import { imageUrl } from "@/lib/utils";
 import type { Post } from "@/types";
 
@@ -32,9 +32,15 @@ export function SnapFeedCard({ post }: { post: Post }) {
               {post.user.nickname}
             </span>
           </span>
-          <span className="flex shrink-0 items-center gap-1 text-xs font-medium text-white">
-            <HeartIcon width={13} height={13} filled={post.liked} />
-            {post.likeCount}
+          <span className="flex shrink-0 items-center gap-2 text-xs font-medium text-white">
+            <span className="flex items-center gap-1">
+              <HeartIcon width={13} height={13} filled={post.liked} />
+              {post.likeCount}
+            </span>
+            <span className="flex items-center gap-1">
+              <CommentIcon width={13} height={13} />
+              {post.commentCount}
+            </span>
           </span>
         </div>
       </div>
