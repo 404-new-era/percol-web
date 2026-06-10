@@ -26,7 +26,7 @@ export interface Product {
   seasonTags: SeasonTag[];
 }
 
-export type ProductSort = "recent" | "price_asc" | "price_desc";
+export type ProductSort = "mixed" | "price_asc" | "price_desc";
 
 /** GET /products 쿼리 */
 export interface ProductListQuery extends PageQuery {

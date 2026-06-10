@@ -13,7 +13,6 @@ const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡
 type SortKey = "rank" | ProductSort;
 const SORTS: { key: SortKey; label: string }[] = [
   { key: "rank", label: "추천순" },
-  { key: "recent", label: "최신순" },
   { key: "price_asc", label: "낮은 가격순" },
   { key: "price_desc", label: "높은 가격순" },
 ];
