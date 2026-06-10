@@ -6,7 +6,7 @@ import { useAllProducts } from "@/hooks/useProducts";
 import { cn, dedupeById } from "@/lib/utils";
 import type { Product } from "@/types";
 
-const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
+import { CATEGORY_TABS as CATEGORIES } from "@/lib/categories";
 const SORTS = [
   { key: "discount", label: "할인율순" },
   { key: "price_asc", label: "낮은 가격순" },

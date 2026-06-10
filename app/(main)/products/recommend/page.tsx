@@ -11,7 +11,7 @@ import { useT } from "@/hooks/useT";
 import { seasonContent, seasonTheme } from "@/lib/personalColor";
 import { cn, dedupeById } from "@/lib/utils";
 
-const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
+import { CATEGORY_TABS as CATEGORIES } from "@/lib/categories";
 const PROMPT_SWATCH = ["#ff8d7a", "#f2a9c4", "#5b6b2f", "#1f3a5f"];
 
 /** 맞춤 추천 — 로그인 저장 진단(latestDiagnosis) 기반. 없으면 진단 유도 + 인기 상품 */

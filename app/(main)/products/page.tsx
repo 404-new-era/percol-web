@@ -8,7 +8,7 @@ import { useAllProducts, useProducts } from "@/hooks/useProducts";
 import { cn, dedupeById } from "@/lib/utils";
 import type { Product, ProductSort } from "@/types";
 
-const CATEGORIES = ["전체", "상의", "하의", "아우터", "원피스", "잡화"];
+import { CATEGORY_TABS as CATEGORIES } from "@/lib/categories";
 // "rank"는 백엔드 기본 정렬(정렬 파라미터 미전달) — 29CM 우선 노출
 type SortKey = "rank" | ProductSort;
 const SORTS: { key: SortKey; label: string }[] = [
