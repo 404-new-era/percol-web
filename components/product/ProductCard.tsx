@@ -57,12 +57,12 @@ export function ProductCard({
         <span className="text-zinc-900">
           {product.price.toLocaleString("ko-KR")}
         </span>
-        {onSale && product.originalPrice != null && (
-          <span className="text-xs font-normal text-zinc-400 line-through">
-            {product.originalPrice.toLocaleString("ko-KR")}
-          </span>
-        )}
       </p>
+      {onSale && product.originalPrice != null && (
+        <p className="text-xs text-zinc-400 line-through">
+          {product.originalPrice.toLocaleString("ko-KR")}
+        </p>
+      )}
 
       {rating != null && (
         <p className="mt-0.5 flex items-center gap-1 text-[11px] text-zinc-400">
